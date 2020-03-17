@@ -7,8 +7,7 @@ module.exports = (sequelize, DataTypes) => {
     {
       username: {
         type: DataTypes.STRING,
-        allowNull: false,
-        unique: true,
+        primaryKey: true,
         validate: {
           is: { args: /^[A-z0-9_.]+$/, msg: 'invalid username' },
           len: { args: [5, 32], msg: 'username length must around 5-32' },
@@ -107,6 +106,11 @@ module.exports = (sequelize, DataTypes) => {
 
     User.hasMany(models.Comment, {
       foreignKey: 'createdBy',
+      sourceKey: 'username',
+    });
+
+    User.hasMany(models.Friend, {
+      foreignKey: 'userA',
       sourceKey: 'username',
     });
   };

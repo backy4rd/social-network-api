@@ -1,16 +1,10 @@
 module.exports = {
   up: (queryInterface, Sequelize) => {
     return queryInterface.createTable('Users', {
-      id: {
-        allowNull: false,
-        autoIncrement: true,
-        primaryKey: true,
-        type: Sequelize.INTEGER,
-      },
       username: {
         type: Sequelize.STRING,
         allowNull: false,
-        unique: true,
+        primaryKey: true,
       },
       password: {
         type: Sequelize.STRING,
@@ -42,7 +36,7 @@ module.exports = {
         allowNull: false,
         type: Sequelize.DATE,
       },
-    });
+    }).then(() => queryInterface.addIndex('Users', ['username']));
   },
   down: (queryInterface, Sequelize) => {
     return queryInterface.dropTable('Users');
