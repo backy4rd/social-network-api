@@ -11,9 +11,6 @@ module.exports = (sequelize, DataTypes) => {
       },
       content: {
         type: DataTypes.STRING,
-        validate: {
-          not: /(script)|(iframe)/i,
-        },
       },
       like: {
         type: DataTypes.INTEGER,

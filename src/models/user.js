@@ -1,3 +1,6 @@
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+
 module.exports = (sequelize, DataTypes) => {
   const User = sequelize.define(
     'User',
@@ -7,28 +10,37 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
         unique: true,
         validate: {
-          is: /^[A-z0-9_.]+$/,
-          len: [5, 32],
+          is: { args: /^[A-z0-9_.]+$/, msg: 'invalid username' },
+          len: { args: [5, 32], msg: 'username length must around 5-32' },
         },
       },
       password: {
         type: DataTypes.STRING,
         allowNull: false,
+        validate: {
+          not: { args: /\s/, msg: 'password can not contain white space' },
+          len: { args: [6, 32], msg: 'password length must around 6-32' },
+        },
       },
       fullName: {
         type: DataTypes.STRING,
         allowNull: false,
         validate: {
-          is: /^[A-z0-9][A-z0-9._\s]+[A-z0-9]$/,
-          not: /\s{2,}/,
+          is: { args: /^[A-z][A-z._\s]+[A-z]$/, msg: 'invalid name' },
+          not: { args: /\s{2,}/, msg: 'invalid name' },
         },
       },
       email: {
         type: DataTypes.STRING,
         allowNull: false,
         validate: {
-          isEmail: true,
+          isEmail: { args: true, msg: 'invalid email' },
         },
+      },
+      avatar: {
+        type: DataTypes.STRING,
+        defaultValue: 'avatars/default.png',
+        allowNull: false,
       },
       verified: {
         type: DataTypes.BOOLEAN,
@@ -39,14 +51,52 @@ module.exports = (sequelize, DataTypes) => {
     {},
   );
 
-  User.prototype.validatePassword = function (user) {
-    const { password } = user;
-    if (/\s/.test(password)) {
-      throw new Error('password contain white space');
-    }
-    if (password.length < 6) {
-      throw new Error('password must longer than 5 character');
-    }
+  User.prototype.encryptPassword = async function () {
+    const salt = parseInt(process.env.SALT_ROUND, 10);
+    this.password = await bcrypt.hash(this.password, salt);
+  };
+
+  User.prototype.comparePassword = function (password) {
+    const { password: encrypted } = this;
+    return bcrypt.compare(password, encrypted);
+  };
+
+  User.prototype.generateAccessToken = function () {
+    const payload = {
+      username: this.username,
+      email: this.email,
+      fullName: this.fullName,
+      verified: this.verified,
+    };
+    const secret = process.env.SECRET;
+    const header = {
+      expiresIn: '7d',
+    };
+
+    return new Promise((resolve, reject) => {
+      jwt.sign(payload, secret, header, (err, token) => {
+        if (err) reject(err);
+        resolve(token);
+      });
+    });
+  };
+
+  User.prototype.generateVerificationToken = function () {
+    const payload = {
+      username: this.username,
+      verify: true,
+    };
+    const secret = process.env.SECRET;
+    const header = {
+      expiresIn: '1d',
+    };
+
+    return new Promise((resolve, reject) => {
+      jwt.sign(payload, secret, header, (err, token) => {
+        if (err) reject(err);
+        resolve(token);
+      });
+    });
   };
 
   User.associate = function (models) {

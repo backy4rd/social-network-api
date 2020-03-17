@@ -24,6 +24,11 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false,
       },
+      avatar: {
+        type: Sequelize.STRING,
+        defaultValue: 'avatars/default.png',
+        allowNull: false,
+      },
       verified: {
         type: Sequelize.BOOLEAN,
         defaultValue: false,
