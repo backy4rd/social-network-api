@@ -1,10 +1,10 @@
 const url = require('url');
-const nodemailer = require('nodemailer');
 const jwt = require('jsonwebtoken');
 
 const { User } = require('../models');
 const asyncHandler = require('../utils/asyncHandler');
 const ErrorResponse = require('../utils/errorResponse');
+const transporter = require('../utils/mailTranspoter');
 
 module.exports.register = asyncHandler(async (req, res) => {
   const { username, password, fullName, email } = req.body;
@@ -58,7 +58,6 @@ module.exports.login = asyncHandler(async (req, res, next) => {
 
 module.exports.sendVerificationMail = asyncHandler(async (req, res, next) => {
   const { username, email, verified } = req.user;
-  const { MAIL_USER: senderMail, MAIL_PASS: senderPass } = process.env;
 
   if (verified) {
     return next(new ErrorResponse('already verified', 400));
@@ -66,14 +65,6 @@ module.exports.sendVerificationMail = asyncHandler(async (req, res, next) => {
 
   const user = await User.findOne({ where: { username } });
   const verificationToken = await user.generateVerificationToken();
-
-  const transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-      user: senderMail,
-      pass: senderPass,
-    },
-  });
 
   const verificationUrl = url.format({
     protocol: 'http',
@@ -86,7 +77,7 @@ module.exports.sendVerificationMail = asyncHandler(async (req, res, next) => {
   });
 
   const mailOptions = {
-    from: senderMail,
+    from: process.env.MAIL_USER,
     to: email,
     subject: 'verification mail',
     text: verificationUrl,
@@ -135,5 +126,68 @@ module.exports.verifyVerificationMail = asyncHandler(async (req, res, next) => {
         token: newToken,
       },
     });
+  });
+});
+
+module.exports.sendForgotMail = asyncHandler(async (req, res, next) => {
+  const { username } = req.query;
+  if (!username) {
+    return next(new ErrorResponse('missing parameters', 400));
+  }
+
+  const user = await User.findOne({ where: { username } });
+  if (!user) {
+    return next(new ErrorResponse("username doen't exist", 404));
+  }
+
+  if (!user.verified) {
+    return next(new ErrorResponse("email hasn't been verified"), 400);
+  }
+
+  const code = Math.floor(Math.random() * 899999 + 100000).toString();
+  const mailOptions = {
+    from: process.env.MAIL_USER,
+    to: user.email,
+    subject: 'change password',
+    text: 'your code: ' + code,
+  };
+
+  req.session.append(username, code);
+
+  res.status(200).json({
+    status: 'success',
+    data: 'send mail success',
+  });
+
+  transporter.sendMail(mailOptions, err => {
+    if (err) console.log(err);
+  });
+});
+
+module.exports.resetPassword = asyncHandler(async (req, res, next) => {
+  const { username, newPassword, forgotCode } = req.body;
+  if (!username || !newPassword || !forgotCode) {
+    return next(new ErrorResponse('missig parameters', 400));
+  }
+
+  const user = await User.findOne({ where: { username } });
+  if (!user) {
+    return next(new ErrorResponse("username doen't exist", 404));
+  }
+
+  if (forgotCode !== req.session.get(username)) {
+    return next(new ErrorResponse('invalid forgot code', 400));
+  }
+
+  user.password = newPassword;
+  await user.validate({ field: ['password'] });
+  await user.encryptPassword();
+  await user.save({ validate: false });
+
+  req.session.remove(username);
+
+  res.status(200).json({
+    status: 'success',
+    data: 'reset password success',
   });
 });

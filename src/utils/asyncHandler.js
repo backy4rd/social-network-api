@@ -3,7 +3,6 @@ module.exports = middleware => {
     try {
       await middleware(req, res, next);
     } catch (err) {
-      console.log(err.message);
       next(err);
     }
   };
