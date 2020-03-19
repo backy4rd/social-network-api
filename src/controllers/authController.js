@@ -167,7 +167,7 @@ module.exports.sendForgotMail = asyncHandler(async (req, res, next) => {
 module.exports.resetPassword = asyncHandler(async (req, res, next) => {
   const { username, newPassword, forgotCode } = req.body;
   if (!username || !newPassword || !forgotCode) {
-    return next(new ErrorResponse('missig parameters', 400));
+    return next(new ErrorResponse('missing parameters', 400));
   }
 
   const user = await User.findOne({ where: { username } });

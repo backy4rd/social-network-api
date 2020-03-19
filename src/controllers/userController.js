@@ -8,10 +8,10 @@ const ErrorResponse = require('../utils/errorResponse');
 module.exports.getUser = asyncHandler(async (req, res, next) => {
   const { username } = req.params;
 
-  const user = await User.findOne(
-    { attributes: { exclude: ['password'] } },
-    { where: { username } },
-  );
+  const user = await User.findOne({
+    attributes: { exclude: ['password'] },
+    where: { username: username },
+  });
 
   if (!user) {
     return next(new ErrorResponse("username doesn't exist"), 404);
