@@ -113,7 +113,7 @@ module.exports.verifyVerificationMail = asyncHandler(async (req, res, next) => {
       return next(new ErrorResponse('already verified', 400));
     }
 
-    await user.setDataValue('verified', true);
+    user.verified = true;
     await user.save();
 
     const newToken = await user.generateAccessToken();

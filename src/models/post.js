@@ -34,6 +34,12 @@ module.exports = (sequelize, DataTypes) => {
       foreignKey: 'postId',
       sourceKey: 'id',
     });
+
+    Post.hasMany(models.PostPhoto, {
+      foreignKey: 'postId',
+      sourceKey: 'id',
+      as: 'photos',
+    });
   };
   return Post;
 };

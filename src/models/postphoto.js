@@ -1,0 +1,18 @@
+module.exports = (sequelize, DataTypes) => {
+  const PostPhoto = sequelize.define(
+    'PostPhoto',
+    {
+      postId: { type: DataTypes.INTEGER, validate: { isInt: true } },
+      photo: { type: DataTypes.STRING, unique: true },
+    },
+    { timestamps: false },
+  );
+  PostPhoto.associate = function (models) {
+    PostPhoto.belongsTo(models.Post, {
+      foreignKey: 'postId',
+      sourceKey: 'id',
+      targetKey: 'id',
+    });
+  };
+  return PostPhoto;
+};
