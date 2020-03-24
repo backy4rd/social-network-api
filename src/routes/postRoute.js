@@ -24,11 +24,15 @@ route.use(express.json());
 route.use(express.urlencoded({ extended: false }));
 route.use(cookieParser());
 
+route.get('/:id', postController.getPost);
+route.get('/:id/comments', postController.getComments);
+
+// these route above doesn't need authorization
 route.use(validateMiddleware.validateAccessToken);
 
-// route.get('/:id/rate', postController.rate);
+route.get('/:id/like', postController.like);
+route.post('/:id/comment', postController.createComment);
 route.post('/', upload.array('photos', 20), postController.createPost);
-// route.get('/:id', postController.getPost);
 route.patch('/:id', upload.array('photos', 20), postController.updatePost);
 
 module.exports = route;

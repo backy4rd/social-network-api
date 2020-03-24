@@ -9,14 +9,15 @@ module.exports = (sequelize, DataTypes) => {
           isInt: true,
         },
       },
-      createdBy: {
+      commenter: {
         type: DataTypes.STRING,
         allowNull: false,
         validate: {
-          is: /^[A-z0-9_.]+$/,
+          is: { args: /^[A-z0-9_.]+$/, msg: 'invalid username' },
+          len: { args: [5, 32], msg: 'username length must around 5-32' },
         },
       },
-      content: { type: DataTypes.STRING },
+      content: { type: DataTypes.STRING, allowNull: false },
       like: {
         type: DataTypes.INTEGER,
         defaultValue: 0,
@@ -31,7 +32,7 @@ module.exports = (sequelize, DataTypes) => {
   );
   Comment.associate = function (models) {
     Comment.belongsTo(models.User, {
-      foreignKey: 'createdBy',
+      foreignKey: 'commenter',
       sourceKey: 'username',
       targetKey: 'username',
     });

@@ -16,7 +16,7 @@ module.exports = {
         },
         onDelete: 'CASCADE',
       },
-      createdBy: {
+      commenter: {
         type: Sequelize.STRING,
         allowNull: false,
         references: {
@@ -25,7 +25,7 @@ module.exports = {
         },
         onDelete: 'CASCADE',
       },
-      content: { type: Sequelize.STRING },
+      content: { type: Sequelize.STRING, allowNull: false },
       like: {
         type: Sequelize.INTEGER,
         defaultValue: 0,

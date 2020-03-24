@@ -105,7 +105,7 @@ module.exports = (sequelize, DataTypes) => {
     });
 
     User.hasMany(models.Comment, {
-      foreignKey: 'createdBy',
+      foreignKey: 'commenter',
       sourceKey: 'username',
     });
 
