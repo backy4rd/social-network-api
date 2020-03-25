@@ -26,6 +26,7 @@ route.use(cookieParser());
 
 route.get('/:id', postController.getPost);
 route.get('/:id/comments', postController.getComments);
+route.get('/:id/likes', postController.getLikes);
 
 // these route above doesn't need authorization
 route.use(validateMiddleware.validateAccessToken);
