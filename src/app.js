@@ -9,6 +9,8 @@ const friendRoute = require('./routes/friendRoute');
 const postRoute = require('./routes/postRoute');
 const commentRoute = require('./routes/commentRoute');
 
+const staticRoute = require('./static');
+
 const app = express();
 
 app.use(morgan('dev'));
@@ -18,6 +20,7 @@ app.use('/api/v1/users', userRoute);
 app.use('/api/v1/friends', friendRoute);
 app.use('/api/v1/posts', postRoute);
 app.use('/api/v1/comments', commentRoute);
+app.use('/static', staticRoute);
 
 app.use(errorHandler);
 
