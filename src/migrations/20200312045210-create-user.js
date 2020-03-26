@@ -20,7 +20,7 @@ module.exports = {
       },
       avatar: {
         type: Sequelize.STRING,
-        defaultValue: 'avatars/default.png',
+        defaultValue: 'avatars/default.jpg',
         allowNull: false,
       },
       verified: {

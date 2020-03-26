@@ -67,7 +67,7 @@ module.exports.sendVerificationMail = asyncHandler(async (req, res, next) => {
   const verificationToken = await user.generateVerificationToken();
 
   const verificationUrl = url.format({
-    protocol: 'http',
+    protocol: process.env.PROTOCOL || 'http',
     hostname: process.env.DOMAIN || 'localhost',
     port: process.env.DOMAIN ? undefined : process.env.PORT,
     pathname: '/api/v1/auth/verify',

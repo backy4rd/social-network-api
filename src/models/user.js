@@ -1,3 +1,4 @@
+const url = require('url');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
@@ -49,6 +50,17 @@ module.exports = (sequelize, DataTypes) => {
     },
     {},
   );
+
+  User.addHook('afterFind', user => {
+    const staticUrl = url.format({
+      protocol: process.env.PROTOCOL || 'http',
+      hostname: process.env.DOMAIN || 'localhost',
+      port: process.env.DOMAIN ? undefined : process.env.PORT,
+      pathname: '/static/',
+    });
+
+    user.dataValues.avatar = staticUrl + user.avatar;
+  });
 
   User.prototype.encryptPassword = async function () {
     const salt = parseInt(process.env.SALT_ROUND, 10);
