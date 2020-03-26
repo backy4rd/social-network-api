@@ -25,16 +25,11 @@ route.use(express.urlencoded({ extended: false }));
 route.use(cookieParser());
 
 route.get('/:username', userController.getUser);
-route.patch(
-  '/info/',
-  upload.single('avatar'),
-  validateMiddleware.validateAccessToken,
-  userController.updateUser,
-);
-route.patch(
-  '/password',
-  validateMiddleware.validateAccessToken,
-  userController.updatePassword,
-);
+route.get('/:username/posts', userController.getUserPost);
+
+route.use(validateMiddleware.validateAccessToken);
+
+route.patch('/info/', upload.single('avatar'), userController.updateUser);
+route.patch('/password', userController.updatePassword);
 
 module.exports = route;

@@ -5,6 +5,7 @@ const multer = require('multer');
 const postController = require('../controllers/postController');
 
 const validateMiddleware = require('../middlewares/validateMiddleware');
+const ownerMiddleware = require('../middlewares/ownerMiddleware');
 
 const ErrorResponse = require('../utils/errorResponse');
 
@@ -34,6 +35,11 @@ route.use(validateMiddleware.validateAccessToken);
 route.get('/:id/like', postController.like);
 route.post('/:id/comment', postController.createComment);
 route.post('/', upload.array('photos', 20), postController.createPost);
+
+// these route above doesn't need authorization
+route.use('/:id', ownerMiddleware.ownerPost);
+
 route.patch('/:id', upload.array('photos', 20), postController.updatePost);
+route.delete('/:id', postController.deletePost);
 
 module.exports = route;

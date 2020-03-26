@@ -49,24 +49,12 @@ module.exports.createPost = asyncHandler(async (req, res, next) => {
 });
 
 module.exports.updatePost = asyncHandler(async (req, res, next) => {
-  const { username } = req.user;
-  const { id: postId } = req.params;
   const { removePhotos, content } = req.body;
-  const { files } = req;
+  const { files, post } = req;
 
   // must have at least one of data to update
   if (!(removePhotos || content || files.length !== 0)) {
     return next(new ErrorResponse('missing parameters', 400));
-  }
-
-  const post = await Post.findByPk(postId, {
-    include: { model: PostPhoto, as: 'photos' },
-  });
-  if (!post) {
-    return next(new ErrorResponse('post not found', 404));
-  }
-  if (post.createdBy !== username) {
-    return next(new ErrorResponse('permission denied', 400));
   }
 
   if (removePhotos) {
@@ -122,6 +110,17 @@ module.exports.updatePost = asyncHandler(async (req, res, next) => {
   });
 });
 
+module.exports.deletePost = asyncHandler(async (req, res, next) => {
+  const { post } = req;
+
+  await post.destroy();
+
+  res.status(200).json({
+    status: 'success',
+    data: 'deleted',
+  });
+});
+
 module.exports.like = asyncHandler(async (req, res, next) => {
   const { id: postId } = req.params;
   const { username } = req.user;
@@ -156,7 +155,7 @@ module.exports.getLikes = asyncHandler(async (req, res, next) => {
   const limit = (req.query.limit || 20) > 200 ? 200 : (req.query.limit || 20);
 
   const users = await Like.findAll({
-    where: { postId },
+    where: { postId: postId },
     offset: parseInt(from, 10),
     limit: parseInt(limit, 10),
     order: ['createdAt'],

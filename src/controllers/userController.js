@@ -1,7 +1,7 @@
 const fs = require('fs');
 const sharp = require('sharp');
 
-const { User } = require('../models');
+const { User, Post, PostPhoto } = require('../models');
 const asyncHandler = require('../utils/asyncHandler');
 const ErrorResponse = require('../utils/errorResponse');
 
@@ -86,5 +86,27 @@ module.exports.updatePassword = asyncHandler(async (req, res, next) => {
   res.status(200).json({
     status: 'success',
     data: 'change password success',
+  });
+});
+
+module.exports.getUserPost = asyncHandler(async (req, res, next) => {
+  const { username } = req.params;
+  const from = req.query.from || 0;
+  const limit = (req.query.limit || 10) > 20 ? 20 : (req.query.limit || 10);
+
+  const posts = await Post.findAll({
+    where: { createdBy: username },
+    offset: parseInt(from, 10),
+    limit: parseInt(limit, 10),
+    order: ['createdAt'],
+    include: [
+      { model: PostPhoto, as: 'photos' },
+      { model: User, attributes: ['fullName'] },
+    ],
+  });
+
+  res.status(200).json({
+    status: 'success',
+    data: posts,
   });
 });
