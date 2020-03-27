@@ -5,6 +5,7 @@ const { User } = require('../models');
 const asyncHandler = require('../utils/asyncHandler');
 const ErrorResponse = require('../utils/errorResponse');
 const transporter = require('../utils/mailTranspoter');
+const responseHander = require('../utils/responseHander');
 
 module.exports.register = asyncHandler(async (req, res) => {
   const { username, password, fullName, email } = req.body;
@@ -15,15 +16,12 @@ module.exports.register = asyncHandler(async (req, res) => {
   await newUser.save({ validate: false });
 
   const token = await newUser.generateAccessToken();
-  const data = newUser.get({ plain: true });
-  // remove password from response
-  delete data.password;
 
   res.cookie('token', token, { httpOnly: true });
 
   res.status(201).json({
     status: 'success',
-    data: data,
+    data: responseHander.processUser(newUser),
   });
 });
 
@@ -44,15 +42,12 @@ module.exports.login = asyncHandler(async (req, res, next) => {
   }
 
   const token = await user.generateAccessToken();
-  const data = user.get({ plain: true });
-  // remove password from response
-  delete data.password;
 
   res.cookie('token', token, { httpOnly: true });
 
   res.status(200).json({
     status: 'success',
-    data: data,
+    data: responseHander.processUser(user),
   });
 });
 

@@ -1,15 +1,5 @@
 module.exports = (err, req, res, next) => {
-  console.log();
-  console.log(err.stack)
-
-  if (err.name === 'TypeError') {
-    return res.status(500).json({
-      status: 'fail',
-      data: err.message,
-    });
-  }
-
-  if (err.name === 'SequelizeValidationError') {
+  if (/Sequelize/.test(err.name)) {
     return res.status(400).json({
       status: 'fail',
       data: err.message.split(',\n'),
@@ -17,9 +7,10 @@ module.exports = (err, req, res, next) => {
   }
 
   if (!err.statusCode) {
-    return res.status(400).json({
-      status: 'fail',
-      data: err.message,
+    console.log(err.stack);
+    return res.status(500).json({
+      status: 'error',
+      data: 'internal server error',
     });
   }
 

@@ -4,6 +4,7 @@ const sharp = require('sharp');
 const { User, Post, PostPhoto, Like, Comment } = require('../models');
 const asyncHandler = require('../utils/asyncHandler');
 const ErrorResponse = require('../utils/errorResponse');
+const responseHander = require('../utils/responseHander');
 
 module.exports.createPost = asyncHandler(async (req, res, next) => {
   const { username } = req.user;
@@ -44,7 +45,7 @@ module.exports.createPost = asyncHandler(async (req, res, next) => {
   newPost.dataValues.photos = await newPost.getPhotos();
   res.status(201).json({
     status: 'success',
-    data: newPost,
+    data: responseHander.processPost(newPost),
   });
 });
 
@@ -106,7 +107,7 @@ module.exports.updatePost = asyncHandler(async (req, res, next) => {
   post.dataValues.photos = await post.getPhotos();
   res.status(200).json({
     status: 'success',
-    data: post,
+    data: responseHander.processPost(post),
   });
 });
 
@@ -152,7 +153,7 @@ module.exports.like = asyncHandler(async (req, res, next) => {
 module.exports.getLikes = asyncHandler(async (req, res, next) => {
   const { id: postId } = req.params;
   const from = req.query.from || 0;
-  const limit = (req.query.limit || 20) > 200 ? 200 : (req.query.limit || 20);
+  const limit = (req.query.limit || 20) > 200 ? 200 : req.query.limit || 20;
 
   const users = await Like.findAll({
     where: { postId: postId },
@@ -197,7 +198,7 @@ module.exports.createComment = asyncHandler(async (req, res, next) => {
 module.exports.getComments = asyncHandler(async (req, res, next) => {
   const { id: postId } = req.params;
   const from = req.query.from || 0;
-  const limit = (req.query.limit || 20) > 50 ? 50 : (req.query.limit || 20);
+  const limit = (req.query.limit || 20) > 50 ? 50 : req.query.limit || 20;
 
   // id represent createAt
   const comments = await Comment.findAll({
@@ -228,6 +229,6 @@ module.exports.getPost = asyncHandler(async (req, res, next) => {
 
   res.status(200).json({
     status: 'success',
-    data: post,
+    data: responseHander.processPost(post),
   });
 });

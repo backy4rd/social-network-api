@@ -1,5 +1,3 @@
-const url = require('url');
-
 module.exports = (sequelize, DataTypes) => {
   const Post = sequelize.define(
     'Post',
@@ -25,27 +23,6 @@ module.exports = (sequelize, DataTypes) => {
     },
     {},
   );
-
-  Post.addHook('afterFind', posts => {
-    const staticUrl = url.format({
-      protocol: process.env.PROTOCOL || 'http',
-      hostname: process.env.DOMAIN || 'localhost',
-      port: process.env.DOMAIN ? undefined : process.env.PORT,
-      pathname: '/static/',
-    });
-
-    if (!Array.isArray(posts)) {
-      posts.photos.forEach(photo => {
-        photo.dataValues.photo = staticUrl + photo.photo;
-      });
-    }
-
-    posts.forEach(post => {
-      post.photos.forEach(photo => {
-        photo.dataValues.photo = staticUrl + photo.photo;
-      });
-    });
-  });
 
   Post.associate = function (models) {
     Post.belongsTo(models.User, {

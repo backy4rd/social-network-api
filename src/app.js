@@ -14,6 +14,11 @@ const staticRoute = require('./static');
 const app = express();
 
 app.use(morgan('dev'));
+// allow fetch from frontend server
+app.use((req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', process.env.WHITELIST || 'null');
+  next();
+});
 
 app.use('/api/v1/auth', authRoute);
 app.use('/api/v1/users', userRoute);

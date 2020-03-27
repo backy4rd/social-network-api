@@ -12,17 +12,17 @@ route.use(express.json());
 route.use(express.urlencoded({ extended: false }));
 route.use(cookieParser());
 
-route.get('/:id/likes', commentController.getLikes);
+route.get('/:id(\\d+)/likes', commentController.getLikes);
 
 // these route above doesn't need authorization
 route.use(validateMiddleware.validateAccessToken);
 
-route.get('/:id/like', commentController.like);
+route.get('/:id(\\d+)/like', commentController.like);
 
 // these route above doesn't need owner permission
-route.use('/:id', ownerMiddleware.ownerComment);
+route.use('/:id(\\d+)', ownerMiddleware.ownerComment);
 
-route.patch('/:id', commentController.updateComment);
-route.delete('/:id', commentController.deleteComment);
+route.patch('/:id(\\d+)', commentController.updateComment);
+route.delete('/:id(\\d+)', commentController.deleteComment);
 
 module.exports = route;

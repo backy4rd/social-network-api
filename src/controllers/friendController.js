@@ -1,4 +1,8 @@
-const { User, Friend, Sequelize: { Op } } = require('../models');
+const {
+  User,
+  Friend,
+  Sequelize: { Op },
+} = require('../models');
 const asyncHandler = require('../utils/asyncHandler');
 const ErrorResponse = require('../utils/errorResponse');
 

@@ -4,6 +4,7 @@ const sharp = require('sharp');
 const { User, Post, PostPhoto } = require('../models');
 const asyncHandler = require('../utils/asyncHandler');
 const ErrorResponse = require('../utils/errorResponse');
+const responseHander = require('../utils/responseHander');
 
 module.exports.getUser = asyncHandler(async (req, res, next) => {
   const { username } = req.params;
@@ -40,7 +41,7 @@ module.exports.updateUser = asyncHandler(async (req, res) => {
     const uniqueName = `${Date.now()}-${Math.random().toFixed(3)}.jpg`;
 
     // remove previous avatar
-    if (user.avatar !== 'avatars/default.png') {
+    if (user.avatar !== 'avatars/default.jpg') {
       fs.unlink(`./static/${user.avatar}`, err => {
         if (err) console.log(err);
       });
@@ -59,7 +60,7 @@ module.exports.updateUser = asyncHandler(async (req, res) => {
 
   res.status(200).json({
     status: 'success',
-    data: user,
+    data: responseHander.processUser(user),
   });
 });
 
@@ -92,7 +93,7 @@ module.exports.updatePassword = asyncHandler(async (req, res, next) => {
 module.exports.getUserPost = asyncHandler(async (req, res, next) => {
   const { username } = req.params;
   const from = req.query.from || 0;
-  const limit = (req.query.limit || 10) > 20 ? 20 : (req.query.limit || 10);
+  const limit = (req.query.limit || 10) > 20 ? 20 : req.query.limit || 10;
 
   const posts = await Post.findAll({
     where: { createdBy: username },
@@ -107,6 +108,6 @@ module.exports.getUserPost = asyncHandler(async (req, res, next) => {
 
   res.status(200).json({
     status: 'success',
-    data: posts,
+    data: responseHander.processPost(posts),
   });
 });

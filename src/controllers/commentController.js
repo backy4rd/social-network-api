@@ -63,7 +63,7 @@ module.exports.like = asyncHandler(async (req, res, next) => {
 module.exports.getLikes = asyncHandler(async (req, res, next) => {
   const { id: commentId } = req.params;
   const from = req.query.from || 0;
-  const limit = (req.query.limit || 20) > 200 ? 200 : (req.query.limit || 20);
+  const limit = (req.query.limit || 20) > 200 ? 200 : req.query.limit || 20;
 
   const users = await CommentLike.findAll({
     where: { commentId: commentId },
