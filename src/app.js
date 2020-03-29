@@ -13,8 +13,10 @@ const staticRoute = require('./static');
 
 const app = express();
 
+app.disable('etag');
+
 app.use(morgan('dev'));
-// allow fetch from frontend server
+// whitelist cors
 app.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Origin', process.env.WHITELIST || 'null');
   next();

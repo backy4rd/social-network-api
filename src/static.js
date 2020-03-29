@@ -6,23 +6,27 @@ const path = require('path');
 const route = express.Router();
 
 const pwd = process.cwd();
+const staticFolder = path.join(pwd, 'static');
+const postFolder = path.join(pwd, 'static/posts');
+const avatarFolder = path.join(pwd, 'static/avatars');
+const defaultAvatar = path.join(pwd, 'static/avatars/default.jpg');
 
-if (!fs.existsSync(path.join(pwd, 'static'))) {
-  fs.mkdirSync(path.join(pwd, 'static'));
+if (!fs.existsSync(staticFolder)) {
+  fs.mkdirSync(staticFolder);
 }
 
-if (!fs.existsSync(path.join(pwd, 'static/avatars'))) {
-  fs.mkdirSync(path.join(pwd, 'static/avatars'));
+if (!fs.existsSync(avatarFolder)) {
+  fs.mkdirSync(avatarFolder);
 }
 
-if (!fs.existsSync(path.join(pwd, 'static/posts'))) {
-  fs.mkdirSync(path.join(pwd, 'static/posts'));
+if (!fs.existsSync(postFolder)) {
+  fs.mkdirSync(postFolder);
 }
 
-if (!fs.existsSync(path.join(pwd, 'static/avatars/default.jpg'))) {
+if (!fs.existsSync(defaultAvatar)) {
   downloader.image({
     url: 'https://i.imgur.com/0G0O0O0.jpg',
-    dest: path.join(pwd, 'static/avatars/default.jpg'),
+    dest: defaultAvatar,
   });
 }
 
