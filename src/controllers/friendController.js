@@ -1,5 +1,4 @@
 const {
-  User,
   Friend,
   Sequelize: { Op },
 } = require('../models');
@@ -8,16 +7,8 @@ const ErrorResponse = require('../utils/errorResponse');
 
 module.exports.addFriend = asyncHandler(async (req, res, next) => {
   const { username } = req.user;
-  const targetName = req.query.target;
+  const { target } = req;
 
-  if (!targetName) {
-    return next(new ErrorResponse('missing parameters', 400));
-  }
-
-  const target = await User.findOne({ where: { username: targetName } });
-  if (!target) {
-    return next(new ErrorResponse("target doen't exist", 404));
-  }
   if (username === target.username) {
     return next(new ErrorResponse("can't addfriend yourself", 400));
   }
@@ -61,16 +52,7 @@ module.exports.addFriend = asyncHandler(async (req, res, next) => {
 
 module.exports.unfriend = asyncHandler(async (req, res, next) => {
   const { username } = req.user;
-  const friendName = req.query.friend;
-
-  if (!friendName) {
-    return next(new ErrorResponse('missing parameters', 400));
-  }
-
-  const friend = await User.findOne({ where: { username: friendName } });
-  if (!friend) {
-    return next(new ErrorResponse("friend doen't exist", 404));
-  }
+  const { target: friend } = req;
 
   const friendship = await Friend.findOne({
     where: {
@@ -105,18 +87,14 @@ module.exports.unfriend = asyncHandler(async (req, res, next) => {
 
 module.exports.decide = asyncHandler(async (req, res, next) => {
   const { username } = req.user;
-  const { action, target: targetName } = req.query;
+  const { action } = req.query;
+  const { target } = req;
 
-  if (!targetName || !action) {
+  if (!action) {
     return next(new ErrorResponse('missing parameters', 400));
   }
   if (!/^(accept|decline)$/.test(action.toLowerCase())) {
     return next(new ErrorResponse('invalid action', 400));
-  }
-
-  const target = await User.findOne({ where: { username: targetName } });
-  if (!target) {
-    return next(new ErrorResponse("target doen't exist", 404));
   }
 
   const friendship = await Friend.findOne({
@@ -164,16 +142,7 @@ module.exports.decide = asyncHandler(async (req, res, next) => {
 
 module.exports.unsend = asyncHandler(async (req, res, next) => {
   const { username } = req.user;
-  const targetName = req.query.target;
-
-  if (!targetName) {
-    return next(new ErrorResponse('missing parameters', 400));
-  }
-
-  const target = await User.findOne({ where: { username: targetName } });
-  if (!target) {
-    return next(new ErrorResponse("target doen't exist", 404));
-  }
+  const { target } = req;
 
   const friendship = await Friend.findOne({
     where: {
