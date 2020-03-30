@@ -11,6 +11,7 @@ const {
 const asyncHandler = require('../utils/asyncHandler');
 const ErrorResponse = require('../utils/errorResponse');
 const responseHander = require('../utils/responseHander');
+const requestHandler = require('../utils/requestHandler');
 
 module.exports.getUser = asyncHandler(async (req, res, next) => {
   const { username } = req.params;
@@ -100,13 +101,12 @@ module.exports.updatePassword = asyncHandler(async (req, res, next) => {
 
 module.exports.getUserPost = asyncHandler(async (req, res, next) => {
   const { username } = req.params;
-  const from = req.query.from || 0;
-  const limit = (req.query.limit || 10) > 20 ? 20 : req.query.limit || 10;
+  const { from, limit } = requestHandler.range(req, [10, 20]);
 
   const posts = await Post.findAll({
     where: { createdBy: username },
-    offset: parseInt(from, 10),
-    limit: parseInt(limit, 10),
+    offset: from,
+    limit: limit,
     order: ['createdAt'],
     include: [
       { model: PostPhoto, as: 'photos' },
@@ -122,14 +122,14 @@ module.exports.getUserPost = asyncHandler(async (req, res, next) => {
 
 module.exports.getFriends = asyncHandler(async (req, res, next) => {
   const { username } = req.params;
-  const from = req.query.from || 0;
-  const limit = (req.query.limit || 20) > 50 ? 50 : req.query.limit || 20;
+  const { from, limit } = requestHandler.range(req, [20, 50]);
 
   const friends = await Friend.findAll({
     where: { [Op.and]: [{ userA: username }, { status: 'friend' }] },
-    offset: parseInt(from, 10),
-    limit: parseInt(limit, 10),
+    offset: from,
+    limit: limit,
     order: ['createdAt'],
+    // exclude password could be in responseHander
     include: [{ model: User, attributes: { exclude: ['password'] } }],
   });
 
@@ -141,13 +141,12 @@ module.exports.getFriends = asyncHandler(async (req, res, next) => {
 
 module.exports.getFriendsRequest = asyncHandler(async (req, res, next) => {
   const { username } = req.user;
-  const from = req.query.from || 0;
-  const limit = (req.query.limit || 20) > 50 ? 50 : req.query.limit || 20;
+  const { from, limit } = requestHandler.range(req, [20, 50]);
 
   const friendRequests = await Friend.findAll({
     where: { [Op.and]: [{ userA: username }, { status: 'pending' }] },
-    offset: parseInt(from, 10),
-    limit: parseInt(limit, 10),
+    offset: from,
+    limit: limit,
     order: ['createdAt'],
   });
 

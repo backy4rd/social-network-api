@@ -5,6 +5,7 @@ const { User, Post, PostPhoto, Like, Comment } = require('../models');
 const asyncHandler = require('../utils/asyncHandler');
 const ErrorResponse = require('../utils/errorResponse');
 const responseHander = require('../utils/responseHander');
+const requestHandler = require('../utils/requestHandler');
 
 module.exports.createPost = asyncHandler(async (req, res, next) => {
   const { username } = req.user;
@@ -153,13 +154,12 @@ module.exports.like = asyncHandler(async (req, res, next) => {
 
 module.exports.getLikes = asyncHandler(async (req, res, next) => {
   const { postId } = req.params;
-  const from = req.query.from || 0;
-  const limit = (req.query.limit || 20) > 200 ? 200 : req.query.limit || 20;
+  const { from, limit } = requestHandler.range(req, [20, 200]);
 
   const users = await Like.findAll({
     where: { postId: postId },
-    offset: parseInt(from, 10),
-    limit: parseInt(limit, 10),
+    offset: from,
+    limit: limit,
     order: ['createdAt'],
     include: { model: User, attributes: ['fullName'] },
   });
@@ -198,14 +198,13 @@ module.exports.createComment = asyncHandler(async (req, res, next) => {
 
 module.exports.getComments = asyncHandler(async (req, res, next) => {
   const { postId } = req.params;
-  const from = req.query.from || 0;
-  const limit = (req.query.limit || 20) > 50 ? 50 : req.query.limit || 20;
+  const { from, limit } = requestHandler.range(req, [20, 50]);
 
   // id represent createAt
   const comments = await Comment.findAll({
     where: { postId },
-    offset: parseInt(from, 10),
-    limit: parseInt(limit, 10),
+    offset: from,
+    limit: limit,
     order: ['id'],
     include: { model: User, attributes: ['fullName'] },
   });
