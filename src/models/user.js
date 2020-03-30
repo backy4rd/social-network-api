@@ -29,6 +29,10 @@ module.exports = (sequelize, DataTypes) => {
           not: { args: /\s{2,}/, msg: 'invalid name' },
         },
       },
+      female: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+      },
       email: {
         type: DataTypes.STRING,
         allowNull: false,
@@ -38,7 +42,7 @@ module.exports = (sequelize, DataTypes) => {
       },
       avatar: {
         type: DataTypes.STRING,
-        defaultValue: 'avatars/default.png',
+        defaultValue: 'avatars/default.jpg',
         allowNull: false,
       },
       verified: {

@@ -26,9 +26,11 @@ route.use(cookieParser());
 
 route.get('/:username', userController.getUser);
 route.get('/:username/posts', userController.getUserPost);
+route.get('/:username/friends', userController.getFriends);
 
 route.use(validateMiddleware.validateAccessToken);
 
+route.get('/request', userController.getFriendsRequest);
 route.patch('/info/', upload.single('avatar'), userController.updateUser);
 route.patch('/password', userController.updatePassword);
 

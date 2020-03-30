@@ -58,6 +58,11 @@ module.exports.updatePost = asyncHandler(async (req, res, next) => {
     return next(new ErrorResponse('missing parameters', 400));
   }
 
+  if (content) {
+    post.content = content;
+  }
+  await post.validate();
+
   if (removePhotos) {
     // filter to get only owner photo
     const filteredPhotos = removePhotos
@@ -97,10 +102,6 @@ module.exports.updatePost = asyncHandler(async (req, res, next) => {
     );
   }
 
-  if (content) {
-    post.content = content;
-  }
-
   await post.save();
 
   // set photos along with response
@@ -123,7 +124,7 @@ module.exports.deletePost = asyncHandler(async (req, res, next) => {
 });
 
 module.exports.like = asyncHandler(async (req, res, next) => {
-  const { id: postId } = req.params;
+  const { postId } = req.params;
   const { username } = req.user;
 
   const post = await Post.findByPk(postId);
@@ -151,7 +152,7 @@ module.exports.like = asyncHandler(async (req, res, next) => {
 });
 
 module.exports.getLikes = asyncHandler(async (req, res, next) => {
-  const { id: postId } = req.params;
+  const { postId } = req.params;
   const from = req.query.from || 0;
   const limit = (req.query.limit || 20) > 200 ? 200 : req.query.limit || 20;
 
@@ -170,7 +171,7 @@ module.exports.getLikes = asyncHandler(async (req, res, next) => {
 });
 
 module.exports.createComment = asyncHandler(async (req, res, next) => {
-  const { id: postId } = req.params;
+  const { postId } = req.params;
   const { username } = req.user;
   const { content } = req.body;
 
@@ -196,7 +197,7 @@ module.exports.createComment = asyncHandler(async (req, res, next) => {
 });
 
 module.exports.getComments = asyncHandler(async (req, res, next) => {
-  const { id: postId } = req.params;
+  const { postId } = req.params;
   const from = req.query.from || 0;
   const limit = (req.query.limit || 20) > 50 ? 50 : req.query.limit || 20;
 
@@ -216,7 +217,7 @@ module.exports.getComments = asyncHandler(async (req, res, next) => {
 });
 
 module.exports.getPost = asyncHandler(async (req, res, next) => {
-  const { id: postId } = req.params;
+  const { postId } = req.params;
 
   const post = await Post.findOne({
     where: { id: postId },

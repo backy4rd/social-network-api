@@ -1,7 +1,13 @@
 const fs = require('fs');
 const sharp = require('sharp');
 
-const { User, Post, PostPhoto } = require('../models');
+const {
+  Friend,
+  User,
+  Post,
+  PostPhoto,
+  Sequelize: { Op },
+} = require('../models');
 const asyncHandler = require('../utils/asyncHandler');
 const ErrorResponse = require('../utils/errorResponse');
 const responseHander = require('../utils/responseHander');
@@ -9,10 +15,7 @@ const responseHander = require('../utils/responseHander');
 module.exports.getUser = asyncHandler(async (req, res, next) => {
   const { username } = req.params;
 
-  const user = await User.findOne({
-    attributes: { exclude: ['password'] },
-    where: { username: username },
-  });
+  const user = await User.findByPk(username);
 
   if (!user) {
     return next(new ErrorResponse("username doesn't exist"), 404);
@@ -20,21 +23,26 @@ module.exports.getUser = asyncHandler(async (req, res, next) => {
 
   res.status(200).json({
     status: 'success',
-    data: user,
+    data: responseHander.processUser(user),
   });
 });
 
-module.exports.updateUser = asyncHandler(async (req, res) => {
-  const user = await User.findOne({
-    attributes: { exclude: ['password'] },
-    where: { username: req.user.username },
-  });
+module.exports.updateUser = asyncHandler(async (req, res, next) => {
+  const { username } = req.user;
+  const { fullName } = req.body;
+  const { file } = req;
 
-  if (req.body.fullName) {
-    user.fullName = req.body.fullName;
+  if (!(fullName || file)) {
+    return next(new ErrorResponse('missing parameters', 400));
   }
 
-  if (req.file) {
+  const user = await User.findByPk(username);
+
+  if (fullName) {
+    user.fullName = fullName;
+  }
+
+  if (file) {
     // if not, avatar will be saved to disk even though data is invalid
     await user.validate({ fields: { exclude: ['password'] } });
 
@@ -48,7 +56,7 @@ module.exports.updateUser = asyncHandler(async (req, res) => {
     }
 
     // resize, convert type and save
-    sharp(req.file.buffer)
+    sharp(file.buffer)
       .resize(720, 720)
       .jpeg()
       .toFile(`./static/avatars/${uniqueName}`);
@@ -109,5 +117,42 @@ module.exports.getUserPost = asyncHandler(async (req, res, next) => {
   res.status(200).json({
     status: 'success',
     data: responseHander.processPost(posts),
+  });
+});
+
+module.exports.getFriends = asyncHandler(async (req, res, next) => {
+  const { username } = req.params;
+  const from = req.query.from || 0;
+  const limit = (req.query.limit || 20) > 50 ? 50 : req.query.limit || 20;
+
+  const friends = await Friend.findAll({
+    where: { [Op.and]: [{ userA: username }, { status: 'friend' }] },
+    offset: parseInt(from, 10),
+    limit: parseInt(limit, 10),
+    order: ['createdAt'],
+    include: [{ model: User, attributes: { exclude: ['password'] } }],
+  });
+
+  res.status(200).json({
+    status: 'success',
+    data: friends,
+  });
+});
+
+module.exports.getFriendsRequest = asyncHandler(async (req, res, next) => {
+  const { username } = req.user;
+  const from = req.query.from || 0;
+  const limit = (req.query.limit || 20) > 50 ? 50 : req.query.limit || 20;
+
+  const friendRequests = await Friend.findAll({
+    where: { [Op.and]: [{ userA: username }, { status: 'pending' }] },
+    offset: parseInt(from, 10),
+    limit: parseInt(limit, 10),
+    order: ['createdAt'],
+  });
+
+  res.status(200).json({
+    status: 'success',
+    data: friendRequests,
   });
 });

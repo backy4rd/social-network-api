@@ -25,25 +25,25 @@ route.use(express.json());
 route.use(express.urlencoded({ extended: false }));
 route.use(cookieParser());
 
-route.get('/:id(\\d+)', postController.getPost);
-route.get('/:id(\\d+)/comments', postController.getComments);
-route.get('/:id(\\d+)/likes', postController.getLikes);
+route.get('/:postId(\\d+)', postController.getPost);
+route.get('/:postId(\\d+)/comments', postController.getComments);
+route.get('/:postId(\\d+)/likes', postController.getLikes);
 
 // these route above doesn't need authorization
 route.use(validateMiddleware.validateAccessToken);
 
-route.get('/:id(\\d+)/like', postController.like);
-route.post('/:id(\\d+)/comment', postController.createComment);
+route.get('/:postId(\\d+)/like', postController.like);
+route.post('/:postId(\\d+)/comment', postController.createComment);
 route.post('/', upload.array('photos', 20), postController.createPost);
 
 // these route above doesn't need authorization
-route.use('/:id(\\d+)', ownerMiddleware.ownerPost);
+route.use('/:postId(\\d+)', ownerMiddleware.ownerPost);
 
 route.patch(
-  '/:id(\\d+)',
+  '/:postId(\\d+)',
   upload.array('photos', 20),
   postController.updatePost,
 );
-route.delete('/:id(\\d+)', postController.deletePost);
+route.delete('/:postId(\\d+)', postController.deletePost);
 
 module.exports = route;

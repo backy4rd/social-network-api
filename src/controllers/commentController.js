@@ -31,7 +31,7 @@ module.exports.deleteComment = asyncHandler(async (req, res, next) => {
 });
 
 module.exports.like = asyncHandler(async (req, res, next) => {
-  const { id: commentId } = req.params;
+  const { commentId } = req.params;
   const { username } = req.user;
 
   const comment = await Comment.findByPk(commentId);
@@ -61,7 +61,7 @@ module.exports.like = asyncHandler(async (req, res, next) => {
 });
 
 module.exports.getLikes = asyncHandler(async (req, res, next) => {
-  const { id: commentId } = req.params;
+  const { commentId } = req.params;
   const from = req.query.from || 0;
   const limit = (req.query.limit || 20) > 200 ? 200 : req.query.limit || 20;
 
