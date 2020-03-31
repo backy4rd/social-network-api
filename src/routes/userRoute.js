@@ -24,13 +24,18 @@ route.use(express.json());
 route.use(express.urlencoded({ extended: false }));
 route.use(cookieParser());
 
+// must above these get route to avoid :username params
+route.get(
+  '/requests',
+  validateMiddleware.validateAccessToken,
+  userController.getFriendsRequest,
+);
 route.get('/:username', userController.getUser);
 route.get('/:username/posts', userController.getUserPost);
 route.get('/:username/friends', userController.getFriends);
 
 route.use(validateMiddleware.validateAccessToken);
 
-route.get('/request', userController.getFriendsRequest);
 route.patch('/info/', upload.single('avatar'), userController.updateUser);
 route.patch('/password', userController.updatePassword);
 

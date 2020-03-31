@@ -19,7 +19,7 @@ module.exports.getUser = asyncHandler(async (req, res, next) => {
   const user = await User.findByPk(username);
 
   if (!user) {
-    return next(new ErrorResponse("username doesn't exist"), 404);
+    return next(new ErrorResponse("username doesn't exist", 404));
   }
 
   res.status(200).json({
@@ -129,13 +129,16 @@ module.exports.getFriends = asyncHandler(async (req, res, next) => {
     offset: from,
     limit: limit,
     order: ['createdAt'],
-    // exclude password could be in responseHander
-    include: [{ model: User, attributes: { exclude: ['password'] } }],
+    include: {
+      model: User,
+      attributes: { exclude: ['password'] },
+      as: 'target',
+    },
   });
 
   res.status(200).json({
     status: 'success',
-    data: friends,
+    data: responseHander.processFriend(friends),
   });
 });
 
@@ -148,10 +151,15 @@ module.exports.getFriendsRequest = asyncHandler(async (req, res, next) => {
     offset: from,
     limit: limit,
     order: ['createdAt'],
+    include: {
+      model: User,
+      attributes: { exclude: ['password'] },
+      as: 'target',
+    },
   });
 
   res.status(200).json({
     status: 'success',
-    data: friendRequests,
+    data: responseHander.processFriend(friendRequests),
   });
 });

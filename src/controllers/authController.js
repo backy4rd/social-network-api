@@ -13,7 +13,7 @@ module.exports.register = asyncHandler(async (req, res) => {
   const newUser = await User.build({
     username: username,
     password: password,
-    female: female,
+    female: female === '1',
     fullName: fullName,
     email: email,
   });

@@ -40,14 +40,21 @@ module.exports.processPost = posts => {
 
 module.exports.processUser = user => {
   const res = user;
-  // convert relative url to absolute url
-  if (user.dataValues.avatar) {
-    res.dataValues.avatar = url.resolve(staticUrl, user.dataValues.avatar);
-  }
-  // remove paasowrd from response
-  if (user.dataValues.password) {
-    delete res.dataValues.password;
-  }
 
-  return user;
+  res.dataValues.avatar = url.resolve(staticUrl, user.dataValues.avatar);
+  delete res.dataValues.password;
+
+  return res;
+};
+
+module.exports.processFriend = friends => {
+  const res = friends;
+
+  res.forEach(friend => {
+    const { target } = friend;
+    target.dataValues.avatar = url.resolve(staticUrl, target.dataValues.avatar);
+    delete target.dataValues.password;
+  });
+
+  return res;
 };
