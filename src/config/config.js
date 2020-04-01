@@ -10,11 +10,12 @@ module.exports = {
   },
 
   test: {
-    database: null,
-    username: null,
-    password: null,
-    host: '127.0.0.1',
+    database: process.env.DB_TEST_NAME,
+    username: process.env.DB_TEST_USER,
+    password: process.env.DB_TEST_PASS,
+    host: process.env.DB_TEST_HOST,
     dialect: 'mysql',
+    logging: false,
   },
 
   production: {

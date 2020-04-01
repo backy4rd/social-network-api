@@ -5,7 +5,10 @@
   "main": "index.js",
   "scripts": {
     "start": "NODE_ENV=production node src/server.js",
-    "dev": "NODE_ENV=development node src/server.js"
+    "dev": "NODE_ENV=development node src/server.js",
+    "test": "NODE_ENV=test mocha src/test --recursive --exit --timeout 10000",
+    "undo": "sequelize db:migrate:undo:all",
+    "migrate": "sequelize db:migrate"
   },
   "author": "",
   "license": "ISC",

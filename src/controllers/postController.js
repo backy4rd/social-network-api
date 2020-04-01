@@ -9,7 +9,7 @@ const requestHandler = require('../utils/requestHandler');
 
 module.exports.createPost = asyncHandler(async (req, res, next) => {
   const { username } = req.user;
-  const { files } = req;
+  const files = req.files || [];
   const { content } = req.body;
 
   if (!(files.length !== 0 || content)) {
@@ -31,7 +31,8 @@ module.exports.createPost = asyncHandler(async (req, res, next) => {
       photoDests.push(`posts/${uniqueName}`);
     });
 
-    await PostPhoto.bulkCreate(
+    // set photos along with response
+    newPost.dataValues.photos = await PostPhoto.bulkCreate(
       photoDests.map(photoDest => ({ postId: newPost.id, photo: photoDest })),
     );
   }
@@ -42,8 +43,6 @@ module.exports.createPost = asyncHandler(async (req, res, next) => {
 
   await newPost.save();
 
-  // set photos along with response
-  newPost.dataValues.photos = await newPost.getPhotos();
   res.status(201).json({
     status: 'success',
     data: responseHander.processPost(newPost),
@@ -52,7 +51,8 @@ module.exports.createPost = asyncHandler(async (req, res, next) => {
 
 module.exports.updatePost = asyncHandler(async (req, res, next) => {
   const { removePhotos, content } = req.body;
-  const { files, post } = req;
+  const { post } = req;
+  const files = req.files || [];
 
   // must have at least one of data to update
   if (!(removePhotos || content || files.length !== 0)) {
@@ -68,8 +68,9 @@ module.exports.updatePost = asyncHandler(async (req, res, next) => {
     // filter to get only owner photo
     const filteredPhotos = removePhotos
       .split(',')
-      .map(Number)
-      .map(removeId => post.photos.find(photo => photo.id === removeId))
+      .map(removeId => {
+        return post.photos.find(photo => photo.id === parseInt(removeId, 10));
+      })
       .filter(photo => photo);
 
     if (filteredPhotos.length !== 0) {
@@ -81,6 +82,10 @@ module.exports.updatePost = asyncHandler(async (req, res, next) => {
         fs.unlink(`./static/${photo.photo}`, err => {
           if (err) console.log(err);
         });
+      });
+
+      post.dataValues.photos = post.photos.filter(photo => {
+        return filteredPhotos.indexOf(photo) === -1;
       });
     }
   }
@@ -98,15 +103,15 @@ module.exports.updatePost = asyncHandler(async (req, res, next) => {
       photoDests.push(`posts/${uniqueName}`);
     });
 
-    await PostPhoto.bulkCreate(
+    const newPhotos = await PostPhoto.bulkCreate(
       photoDests.map(photoDest => ({ postId: post.id, photo: photoDest })),
     );
+
+    post.dataValues.photos.push(...newPhotos);
   }
 
   await post.save();
 
-  // set photos along with response
-  post.dataValues.photos = await post.getPhotos();
   res.status(200).json({
     status: 'success',
     data: responseHander.processPost(post),

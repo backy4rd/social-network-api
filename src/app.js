@@ -15,7 +15,10 @@ const app = express();
 
 app.disable('etag');
 
-app.use(morgan('dev'));
+if (process.env.NODE_ENV !== 'test') {
+  app.use(morgan('dev'));
+}
+
 // whitelist cors
 app.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Origin', process.env.WHITELIST || 'null');

@@ -7,11 +7,11 @@ module.exports.validateAccessToken = asyncHandler((req, res, next) => {
   const secret = process.env.SECRET;
 
   if (!token) {
-    return next(new ErrorResponse('token not found', 404));
+    return next(new ErrorResponse('unauthorized', 401));
   }
 
   jwt.verify(token, secret, (err, decode) => {
-    if (err) return next(err);
+    if (err) return next(new ErrorResponse('unauthorized', 401));
     req.user = decode;
   });
 
