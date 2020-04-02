@@ -19,6 +19,11 @@ module.exports = {
       content: {
         type: Sequelize.STRING,
       },
+      status: {
+        type: Sequelize.STRING,
+        defaultValue: 'public',
+        allowNull: false,
+      },
       like: {
         type: Sequelize.INTEGER,
         allowNull: false,

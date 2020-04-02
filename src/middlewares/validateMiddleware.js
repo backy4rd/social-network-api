@@ -13,7 +13,20 @@ module.exports.validateAccessToken = asyncHandler((req, res, next) => {
   jwt.verify(token, secret, (err, decode) => {
     if (err) return next(new ErrorResponse('unauthorized', 401));
     req.user = decode;
-  });
 
-  next();
+    next();
+  });
+});
+
+module.exports.identify = asyncHandler((req, res, next) => {
+  const { token } = req.cookies;
+  const secret = process.env.SECRET;
+
+  if (!token) return next();
+
+  jwt.verify(token, secret, (err, decode) => {
+    if (err) return next();
+    req.user = decode;
+    next();
+  });
 });

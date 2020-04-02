@@ -1,6 +1,7 @@
 const { User, Comment, CommentLike } = require('../models');
 const asyncHandler = require('../utils/asyncHandler');
 const ErrorResponse = require('../utils/errorResponse');
+const requestHandler = require('../utils/requestHandler');
 
 module.exports.updateComment = asyncHandler(async (req, res, next) => {
   const { comment } = req;
@@ -63,7 +64,7 @@ module.exports.like = asyncHandler(async (req, res, next) => {
 module.exports.getLikes = asyncHandler(async (req, res, next) => {
   const { commentId } = req.params;
   const from = req.query.from || 0;
-  const limit = (req.query.limit || 20) > 200 ? 200 : req.query.limit || 20;
+  const limit = requestHandler.range(req, [20, 200]);
 
   const users = await CommentLike.findAll({
     where: { commentId: commentId },

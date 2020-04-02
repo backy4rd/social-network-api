@@ -99,12 +99,30 @@ module.exports.updatePassword = asyncHandler(async (req, res, next) => {
   });
 });
 
-module.exports.getUserPost = asyncHandler(async (req, res, next) => {
+module.exports.getPost = asyncHandler(async (req, res, next) => {
   const { username } = req.params;
+  const { user } = req;
   const { from, limit } = requestHandler.range(req, [10, 20]);
 
+  const status = ['public'];
+
+  if (user) {
+    const isFriend = await Friend.count({
+      where: { userA: username, userB: user.username },
+    });
+
+    if (isFriend) {
+      status.push('friend');
+    }
+
+    // user get their own post
+    if (user.username === username) {
+      status.push('friend', 'private');
+    }
+  }
+
   const posts = await Post.findAll({
-    where: { createdBy: username },
+    where: { [Op.and]: [{ createdBy: username }, { status: status }] },
     offset: from,
     limit: limit,
     order: ['createdAt'],
@@ -112,6 +130,24 @@ module.exports.getUserPost = asyncHandler(async (req, res, next) => {
       { model: PostPhoto, as: 'photos' },
       { model: User, attributes: ['fullName'] },
     ],
+  });
+
+  res.status(200).json({
+    status: 'success',
+    data: responseHander.processPost(posts),
+  });
+});
+
+module.exports.getOwnPost = asyncHandler(async (req, res, next) => {
+  const { username } = req.user;
+  const { from, limit } = requestHandler.range(req, [10, 20]);
+
+  const posts = await Post.findAll({
+    where: { createdBy: username },
+    offset: from,
+    limit: limit,
+    order: ['createdAt'],
+    include: [{ model: PostPhoto, as: 'photos' }],
   });
 
   res.status(200).json({

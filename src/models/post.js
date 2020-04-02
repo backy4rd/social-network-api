@@ -6,11 +6,23 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: false,
         validate: {
-          is: /^[A-z0-9_.]+$/,
+          is: { args: /^[A-z0-9_.]+$/, msg: 'invalid username' },
+          len: { args: [5, 32], msg: 'username length must around 5-32' },
         },
       },
       content: {
         type: DataTypes.STRING,
+      },
+      status: {
+        type: DataTypes.STRING,
+        defaultValue: 'public',
+        allowNull: false,
+        validate: {
+          is: {
+            args: /^(public)|(friend)|(private)$/,
+            msg: 'status only be public, friend and private',
+          },
+        },
       },
       like: {
         type: DataTypes.INTEGER,
@@ -40,6 +52,11 @@ module.exports = (sequelize, DataTypes) => {
       foreignKey: 'postId',
       sourceKey: 'id',
       as: 'photos',
+    });
+
+    Post.hasMany(models.Like, {
+      foreignKey: 'postId',
+      sourceKey: 'id',
     });
   };
   return Post;

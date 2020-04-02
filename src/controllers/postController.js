@@ -1,7 +1,7 @@
 const fs = require('fs');
 const sharp = require('sharp');
 
-const { User, Post, PostPhoto, Like, Comment } = require('../models');
+const { User, Post, Friend, PostPhoto, Like, Comment } = require('../models');
 const asyncHandler = require('../utils/asyncHandler');
 const ErrorResponse = require('../utils/errorResponse');
 const responseHander = require('../utils/responseHander');
@@ -10,12 +10,13 @@ const requestHandler = require('../utils/requestHandler');
 module.exports.createPost = asyncHandler(async (req, res, next) => {
   const { username } = req.user;
   const files = req.files || [];
-  const { content } = req.body;
+  const { content, status } = req.body;
 
   if (!(files.length !== 0 || content)) {
     return next(new ErrorResponse('missing parameters', 400));
   }
 
+  // can't build because it will not initialize default property
   const newPost = await Post.create({ createdBy: username });
 
   if (files.length !== 0) {
@@ -40,8 +41,17 @@ module.exports.createPost = asyncHandler(async (req, res, next) => {
   if (content) {
     newPost.content = content;
   }
+  if (status) {
+    newPost.status = status;
+  }
 
-  await newPost.save();
+  // destroy if data not valid
+  try {
+    await newPost.save();
+  } catch (err) {
+    newPost.destroy();
+    return next(err);
+  }
 
   res.status(201).json({
     status: 'success',
@@ -50,17 +60,20 @@ module.exports.createPost = asyncHandler(async (req, res, next) => {
 });
 
 module.exports.updatePost = asyncHandler(async (req, res, next) => {
-  const { removePhotos, content } = req.body;
+  const { removePhotos, content, status } = req.body;
   const { post } = req;
   const files = req.files || [];
 
   // must have at least one of data to update
-  if (!(removePhotos || content || files.length !== 0)) {
+  if (!(status || removePhotos || content || files.length !== 0)) {
     return next(new ErrorResponse('missing parameters', 400));
   }
 
   if (content) {
     post.content = content;
+  }
+  if (status) {
+    post.status = status;
   }
   await post.validate();
 
@@ -121,6 +134,15 @@ module.exports.updatePost = asyncHandler(async (req, res, next) => {
 module.exports.deletePost = asyncHandler(async (req, res, next) => {
   const { post } = req;
 
+  const photos = await post.getPhotos();
+
+  // delete photo from storage
+  photos.forEach(photo => {
+    fs.unlink(`./static/${photo.photo}`, err => {
+      if (err) console.log(err);
+    });
+  });
+
   await post.destroy();
 
   res.status(200).json({
@@ -130,27 +152,24 @@ module.exports.deletePost = asyncHandler(async (req, res, next) => {
 });
 
 module.exports.like = asyncHandler(async (req, res, next) => {
-  const { postId } = req.params;
+  const { post } = req;
   const { username } = req.user;
 
-  const post = await Post.findByPk(postId);
-  if (!post) {
-    return next(new ErrorResponse('post not found', 404));
-  }
-
-  const like = await Like.findOne({ where: { liker: username, postId } });
+  const like = await Like.findOne({
+    where: { liker: username, postId: post.id },
+  });
 
   if (like) {
     await like.destroy();
-    await post.increment({ like: -1 }, { where: { id: postId } });
+    await post.increment({ like: -1 }, { where: { id: post.id } });
     return res.status(200).json({
       status: 'success',
       data: 'unliked',
     });
   }
 
-  await Like.create({ liker: username, postId: postId });
-  await post.increment({ like: 1 }, { where: { id: postId } });
+  await Like.create({ liker: username, postId: post.id });
+  await post.increment({ like: 1 }, { where: { id: post.id } });
   res.status(200).json({
     status: 'success',
     data: 'liked',
@@ -158,11 +177,10 @@ module.exports.like = asyncHandler(async (req, res, next) => {
 });
 
 module.exports.getLikes = asyncHandler(async (req, res, next) => {
-  const { postId } = req.params;
+  const { post } = req;
   const { from, limit } = requestHandler.range(req, [20, 200]);
 
-  const users = await Like.findAll({
-    where: { postId: postId },
+  const likes = await post.getLikes({
     offset: from,
     limit: limit,
     order: ['createdAt'],
@@ -171,12 +189,12 @@ module.exports.getLikes = asyncHandler(async (req, res, next) => {
 
   res.status(200).json({
     status: 'success',
-    data: users,
+    data: likes,
   });
 });
 
 module.exports.createComment = asyncHandler(async (req, res, next) => {
-  const { postId } = req.params;
+  const { post } = req;
   const { username } = req.user;
   const { content } = req.body;
 
@@ -184,14 +202,9 @@ module.exports.createComment = asyncHandler(async (req, res, next) => {
     return next(new ErrorResponse('missing parameters', 400));
   }
 
-  const post = await Post.count({ where: { id: postId } });
-  if (!post) {
-    return next(new ErrorResponse('post not found', 404));
-  }
-
   const newComment = await Comment.create({
     commenter: username,
-    postId: parseInt(postId, 10),
+    postId: post.id,
     content: content,
   });
 
@@ -202,12 +215,11 @@ module.exports.createComment = asyncHandler(async (req, res, next) => {
 });
 
 module.exports.getComments = asyncHandler(async (req, res, next) => {
-  const { postId } = req.params;
+  const { post } = req;
   const { from, limit } = requestHandler.range(req, [20, 50]);
 
   // id represent createAt
-  const comments = await Comment.findAll({
-    where: { postId },
+  const comments = await post.getComments({
     offset: from,
     limit: limit,
     order: ['id'],
@@ -221,16 +233,7 @@ module.exports.getComments = asyncHandler(async (req, res, next) => {
 });
 
 module.exports.getPost = asyncHandler(async (req, res, next) => {
-  const { postId } = req.params;
-
-  const post = await Post.findOne({
-    where: { id: postId },
-    include: { model: PostPhoto, as: 'photos' },
-  });
-
-  if (!post) {
-    return next(new ErrorResponse('post not found', 404));
-  }
+  const { post } = req;
 
   res.status(200).json({
     status: 'success',

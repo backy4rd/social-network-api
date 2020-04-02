@@ -30,8 +30,19 @@ route.get(
   validateMiddleware.validateAccessToken,
   userController.getFriendsRequest,
 );
+
+// must above these get route to avoid :username params
+route.get(
+  '/posts',
+  validateMiddleware.validateAccessToken,
+  userController.getOwnPost,
+);
 route.get('/:username', userController.getUser);
-route.get('/:username/posts', userController.getUserPost);
+route.get(
+  '/:username/posts',
+  validateMiddleware.identify,
+  userController.getPost,
+);
 route.get('/:username/friends', userController.getFriends);
 
 route.use(validateMiddleware.validateAccessToken);
