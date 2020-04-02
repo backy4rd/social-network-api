@@ -28,10 +28,12 @@ module.exports.deleteComment = asyncHandler(async (req, res, next) => {
 
   if (comment.commenter !== username) {
     await Notification.destroy({
-      owner: comment.commenter,
-      from: username,
-      commentId: comment.id,
-      action: 'comment',
+      where: {
+        owner: comment.commenter,
+        from: username,
+        commentId: comment.id,
+        action: 'comment',
+      },
     });
   }
 
