@@ -1,7 +1,14 @@
 const fs = require('fs');
 const sharp = require('sharp');
 
-const { User, Post, Friend, PostPhoto, Like, Comment } = require('../models');
+const {
+  User,
+  Post,
+  PostPhoto,
+  Like,
+  Comment,
+  Notification,
+} = require('../models');
 const asyncHandler = require('../utils/asyncHandler');
 const ErrorResponse = require('../utils/errorResponse');
 const responseHander = require('../utils/responseHander');
@@ -161,6 +168,16 @@ module.exports.like = asyncHandler(async (req, res, next) => {
 
   if (like) {
     await like.destroy();
+    if (post.createdBy !== username) {
+      await Notification.destroy({
+        where: {
+          owner: post.createdBy,
+          from: username,
+          postId: post.id,
+          action: 'like',
+        },
+      });
+    }
     await post.increment({ like: -1 }, { where: { id: post.id } });
     return res.status(200).json({
       status: 'success',
@@ -168,6 +185,14 @@ module.exports.like = asyncHandler(async (req, res, next) => {
     });
   }
 
+  if (post.createdBy !== username) {
+    await Notification.create({
+      owner: post.createdBy,
+      from: username,
+      postId: post.id,
+      action: 'like',
+    });
+  }
   await Like.create({ liker: username, postId: post.id });
   await post.increment({ like: 1 }, { where: { id: post.id } });
   res.status(200).json({
@@ -207,6 +232,15 @@ module.exports.createComment = asyncHandler(async (req, res, next) => {
     postId: post.id,
     content: content,
   });
+
+  if (post.createdBy !== username) {
+    await Notification.create({
+      owner: post.createdBy,
+      from: username,
+      postId: post.id,
+      action: 'comment',
+    });
+  }
 
   res.status(201).json({
     status: 'success',

@@ -1,4 +1,4 @@
-const { User, Comment, CommentLike } = require('../models');
+const { User, Comment, CommentLike, Notification } = require('../models');
 const asyncHandler = require('../utils/asyncHandler');
 const ErrorResponse = require('../utils/errorResponse');
 const requestHandler = require('../utils/requestHandler');
@@ -22,8 +22,18 @@ module.exports.updateComment = asyncHandler(async (req, res, next) => {
 
 module.exports.deleteComment = asyncHandler(async (req, res, next) => {
   const { comment } = req;
+  const { username } = req.user;
 
   await comment.destroy();
+
+  if (comment.commenter !== username) {
+    await Notification.destroy({
+      owner: comment.commenter,
+      from: username,
+      commentId: comment.id,
+      action: 'comment',
+    });
+  }
 
   res.status(200).json({
     status: 'success',
@@ -37,7 +47,7 @@ module.exports.like = asyncHandler(async (req, res, next) => {
 
   const comment = await Comment.findByPk(commentId);
   if (!comment) {
-    return next(new ErrorResponse('post not found', 404));
+    return next(new ErrorResponse('comment not found', 404));
   }
 
   const like = await CommentLike.findOne({
@@ -46,6 +56,16 @@ module.exports.like = asyncHandler(async (req, res, next) => {
 
   if (like) {
     await like.destroy();
+    if (comment.commenter !== username) {
+      await Notification.destroy({
+        where: {
+          owner: comment.commenter,
+          from: username,
+          postId: comment.id,
+          action: 'like',
+        },
+      });
+    }
     await comment.increment({ like: -1 }, { where: { id: commentId } });
     return res.status(200).json({
       status: 'success',
@@ -54,6 +74,14 @@ module.exports.like = asyncHandler(async (req, res, next) => {
   }
 
   await CommentLike.create({ liker: username, commentId: commentId });
+  if (comment.commenter !== username) {
+    await Notification.create({
+      owner: comment.commenter,
+      from: username,
+      postId: comment.id,
+      action: 'like',
+    });
+  }
   await comment.increment({ like: 1 }, { where: { id: commentId } });
   res.status(200).json({
     status: 'success',
