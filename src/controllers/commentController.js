@@ -26,24 +26,52 @@ module.exports.deleteComment = asyncHandler(async (req, res, next) => {
 
   await comment.destroy();
 
-  if (comment.commenter !== username) {
-    await Notification.destroy({
-      where: {
-        owner: comment.commenter,
-        from: username,
-        commentId: comment.id,
-        action: 'comment',
-      },
-    });
-  }
-
   res.status(200).json({
     status: 'success',
     data: 'deleted',
   });
 });
 
-module.exports.like = asyncHandler(async (req, res, next) => {
+module.exports.replyComment = asyncHandler(async (req, res, next) => {
+  const { commentId } = req.params;
+  const { content } = req.body;
+  const { username } = req.user;
+
+  if (!content) {
+    return next(new ErrorResponse('missing parameters', 400));
+  }
+
+  const comment = await Comment.findByPk(commentId);
+  if (!comment) {
+    return next(new ErrorResponse('comment not found', 404));
+  }
+  if (comment.replyOf !== null) {
+    return next(new ErrorResponse('unaccept nesting reply', 400));
+  }
+
+  const replyComment = await Comment.create({
+    commenter: username,
+    postId: comment.postId,
+    replyOf: comment.id,
+    content: content,
+  });
+
+  if (comment.commenter !== username) {
+    await Notification.create({
+      owner: comment.commenter,
+      from: username,
+      commentId: comment.id,
+      action: 'comment',
+    });
+  }
+
+  res.status(201).json({
+    status: 'success',
+    data: replyComment,
+  });
+});
+
+module.exports.likeComment = asyncHandler(async (req, res, next) => {
   const { commentId } = req.params;
   const { username } = req.user;
 
@@ -58,16 +86,6 @@ module.exports.like = asyncHandler(async (req, res, next) => {
 
   if (like) {
     await like.destroy();
-    if (comment.commenter !== username) {
-      await Notification.destroy({
-        where: {
-          owner: comment.commenter,
-          from: username,
-          postId: comment.id,
-          action: 'like',
-        },
-      });
-    }
     await comment.increment({ like: -1 }, { where: { id: commentId } });
     return res.status(200).json({
       status: 'success',
@@ -80,7 +98,7 @@ module.exports.like = asyncHandler(async (req, res, next) => {
     await Notification.create({
       owner: comment.commenter,
       from: username,
-      postId: comment.id,
+      commentId: comment.id,
       action: 'like',
     });
   }
@@ -91,10 +109,9 @@ module.exports.like = asyncHandler(async (req, res, next) => {
   });
 });
 
-module.exports.getLikes = asyncHandler(async (req, res, next) => {
+module.exports.getCommentLikes = asyncHandler(async (req, res, next) => {
   const { commentId } = req.params;
-  const from = req.query.from || 0;
-  const limit = requestHandler.range(req, [20, 200]);
+  const { from, limit } = requestHandler.range(req, [20, 200]);
 
   const users = await CommentLike.findAll({
     where: { commentId: commentId },

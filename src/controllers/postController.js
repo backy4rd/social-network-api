@@ -168,16 +168,6 @@ module.exports.like = asyncHandler(async (req, res, next) => {
 
   if (like) {
     await like.destroy();
-    if (post.createdBy !== username) {
-      await Notification.destroy({
-        where: {
-          owner: post.createdBy,
-          from: username,
-          postId: post.id,
-          action: 'like',
-        },
-      });
-    }
     await post.increment({ like: -1 }, { where: { id: post.id } });
     return res.status(200).json({
       status: 'success',
@@ -254,6 +244,7 @@ module.exports.getComments = asyncHandler(async (req, res, next) => {
 
   // id represent createAt
   const comments = await post.getComments({
+    where: { replyOf: null },
     offset: from,
     limit: limit,
     order: ['id'],

@@ -12,12 +12,12 @@ route.use(express.json());
 route.use(express.urlencoded({ extended: false }));
 route.use(cookieParser());
 
-route.get('/:commentId(\\d+)/likes', commentController.getLikes);
+route.get('/:commentId(\\d+)/likes', commentController.getCommentLikes);
 
 // these route above doesn't need authorization
 route.use(validateMiddleware.validateAccessToken);
 
-route.get('/:commentId(\\d+)/like', commentController.like);
+route.get('/:commentId(\\d+)/like', commentController.likeComment);
 
 // these route above doesn't need owner permission
 route.use('/:commentId(\\d+)', ownerMiddleware.ownerComment);
