@@ -2,11 +2,14 @@ const express = require('express');
 const cookieParser = require('cookie-parser');
 const multer = require('multer');
 
+const commentRoute = require('./commentRoute');
+
 const postController = require('../controllers/postController');
 
 const validateMiddleware = require('../middlewares/validateMiddleware');
 const ownerMiddleware = require('../middlewares/ownerMiddleware');
 const checkerMiddleware = require('../middlewares/checkerMiddleware');
+const finderMiddleware = require('../middlewares/finderMiddleware');
 
 const ErrorResponse = require('../utils/errorResponse');
 
@@ -26,56 +29,60 @@ route.use(express.json());
 route.use(express.urlencoded({ extended: false }));
 route.use(cookieParser());
 
-// get post by id
-route.get(
-  '/:postId(\\d+)',
-  validateMiddleware.identify,
-  checkerMiddleware.checkPostStatusPermission,
-  postController.getPost,
-);
-// get comment of post by id
-route.get(
-  '/:postId(\\d+)/comments',
-  validateMiddleware.identify,
-  checkerMiddleware.checkPostStatusPermission,
-  postController.getComments,
-);
-// get like of post by id
-route.get(
-  '/:postId(\\d+)/likes',
-  validateMiddleware.identify,
-  checkerMiddleware.checkPostStatusPermission,
-  postController.getLikes,
-);
+route.use('/:postId(\\d+)/comments', commentRoute);
 
-// these route above doesn't need authorization
-route.use(validateMiddleware.validateAccessToken);
-
-// like post
-route.get(
-  '/:postId(\\d+)/like',
-  checkerMiddleware.checkPostStatusPermission,
-  postController.like,
-);
-// comment post
-route.post(
-  '/:postId(\\d+)/comment',
-  checkerMiddleware.checkPostStatusPermission,
-  postController.createComment,
-);
 // create post
-route.post('/', upload.array('photos', 20), postController.createPost);
-
-// these route above doesn't need owner permission
-route.use('/:postId(\\d+)', ownerMiddleware.ownerPost);
+route.post(
+  '/',
+  upload.array('photos', 20),
+  validateMiddleware.validateAccessToken,
+  postController.createPost,
+);
 
 // update post
 route.patch(
   '/:postId(\\d+)',
+  validateMiddleware.validateAccessToken,
+  finderMiddleware.findPost,
+  ownerMiddleware.ownerPost,
   upload.array('photos', 20),
   postController.updatePost,
 );
+
 // delete post
-route.delete('/:postId(\\d+)', postController.deletePost);
+route.delete(
+  '/:postId(\\d+)',
+  validateMiddleware.validateAccessToken,
+  finderMiddleware.findPost,
+  ownerMiddleware.ownerPost,
+  postController.deletePost,
+);
+
+// get post
+route.get(
+  '/:postId(\\d+)',
+  validateMiddleware.identify,
+  finderMiddleware.findPost,
+  checkerMiddleware.checkPostStatusPermission,
+  postController.getPost,
+);
+
+// like post
+route.get(
+  '/:postId(\\d+)/like',
+  validateMiddleware.validateAccessToken,
+  finderMiddleware.findPost,
+  checkerMiddleware.checkPostStatusPermission,
+  postController.like,
+);
+
+// get like of post
+route.get(
+  '/:postId(\\d+)/likes',
+  validateMiddleware.identify,
+  finderMiddleware.findPost,
+  checkerMiddleware.checkPostStatusPermission,
+  postController.getLikes,
+);
 
 module.exports = route;

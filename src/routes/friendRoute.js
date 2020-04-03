@@ -4,17 +4,44 @@ const cookieParser = require('cookie-parser');
 const friendController = require('../controllers/friendController');
 
 const validateMiddleware = require('../middlewares/validateMiddleware');
-const checkerMiddleware = require('../middlewares/checkerMiddleware');
+const finderMiddleware = require('../middlewares/finderMiddleware');
 
 const route = express.Router();
 
 route.use(cookieParser());
 route.use(validateMiddleware.validateAccessToken);
-route.use(checkerMiddleware.checkTarget);
+route.use(finderMiddleware.findTarget);
 
-route.get('/add', friendController.addFriend);
-route.get('/breakup', friendController.unfriend);
-route.get('/decide', friendController.decide);
-route.get('/unsend', friendController.unsend);
+// add friend
+route.get(
+  '/add',
+  validateMiddleware.validateAccessToken,
+  finderMiddleware.findTarget,
+  friendController.addFriend,
+);
+
+// unfriend
+route.get(
+  '/breakup',
+  validateMiddleware.validateAccessToken,
+  finderMiddleware.findTarget,
+  friendController.unfriend,
+);
+
+// decide friend request
+route.get(
+  '/decide',
+  validateMiddleware.validateAccessToken,
+  finderMiddleware.findTarget,
+  friendController.decide,
+);
+
+// unsend friend request
+route.get(
+  '/unsend',
+  validateMiddleware.validateAccessToken,
+  finderMiddleware.findTarget,
+  friendController.unsend,
+);
 
 module.exports = route;

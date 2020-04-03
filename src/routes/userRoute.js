@@ -24,30 +24,46 @@ route.use(express.json());
 route.use(express.urlencoded({ extended: false }));
 route.use(cookieParser());
 
-// must above these get route to avoid :username params
+// get user post
+route.get(
+  '/:username/posts',
+  validateMiddleware.identify,
+  userController.getPost,
+);
+
+// get own friend request
 route.get(
   '/requests',
   validateMiddleware.validateAccessToken,
   userController.getFriendsRequest,
 );
 
-// must above these get route to avoid :username params
+// get own post
 route.get(
   '/posts',
   validateMiddleware.validateAccessToken,
   userController.getOwnPost,
 );
+
+// get user
 route.get('/:username', userController.getUser);
-route.get(
-  '/:username/posts',
-  validateMiddleware.identify,
-  userController.getPost,
-);
+
+// get friend
 route.get('/:username/friends', userController.getFriends);
 
-route.use(validateMiddleware.validateAccessToken);
+// update user
+route.patch(
+  '/info/',
+  validateMiddleware.validateAccessToken,
+  upload.single('avatar'),
+  userController.updateUser,
+);
 
-route.patch('/info/', upload.single('avatar'), userController.updateUser);
-route.patch('/password', userController.updatePassword);
+// update password
+route.patch(
+  '/password',
+  validateMiddleware.validateAccessToken,
+  userController.updatePassword,
+);
 
 module.exports = route;

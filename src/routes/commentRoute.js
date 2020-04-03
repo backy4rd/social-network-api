@@ -5,24 +5,83 @@ const commentController = require('../controllers/commentController');
 
 const validateMiddleware = require('../middlewares/validateMiddleware');
 const ownerMiddleware = require('../middlewares/ownerMiddleware');
+const checkerMiddleware = require('../middlewares/checkerMiddleware');
+const finderMiddleware = require('../middlewares/finderMiddleware');
 
-const route = express.Router();
+const route = express.Router({ mergeParams: true });
 
 route.use(express.json());
 route.use(express.urlencoded({ extended: false }));
 route.use(cookieParser());
 
-route.get('/:commentId(\\d+)/likes', commentController.getCommentLikes);
+// create comment
+route.post(
+  '/',
+  validateMiddleware.validateAccessToken,
+  finderMiddleware.findPost,
+  checkerMiddleware.checkPostStatusPermission,
+  commentController.createComment,
+);
 
-// these route above doesn't need authorization
-route.use(validateMiddleware.validateAccessToken);
+// update comment
+route.patch(
+  '/:commentId(\\d+)',
+  validateMiddleware.validateAccessToken,
+  finderMiddleware.findPost,
+  checkerMiddleware.checkPostStatusPermission,
+  finderMiddleware.findComment,
+  ownerMiddleware.ownerComment,
+  commentController.updateComment,
+);
 
-route.get('/:commentId(\\d+)/like', commentController.likeComment);
+// delete comment
+route.delete(
+  '/:commentId(\\d+)',
+  validateMiddleware.validateAccessToken,
+  finderMiddleware.findPost,
+  checkerMiddleware.checkPostStatusPermission,
+  finderMiddleware.findComment,
+  ownerMiddleware.ownerComment,
+  commentController.deleteComment,
+);
 
-// these route above doesn't need owner permission
-route.use('/:commentId(\\d+)', ownerMiddleware.ownerComment);
+// get post comment
+route.get(
+  '/',
+  validateMiddleware.identify,
+  finderMiddleware.findPost,
+  checkerMiddleware.checkPostStatusPermission,
+  commentController.getPostComments,
+);
 
-route.patch('/:commentId(\\d+)', commentController.updateComment);
-route.delete('/:commentId(\\d+)', commentController.deleteComment);
+// reply comment
+route.post(
+  '/:commentId(\\d+)/reply',
+  validateMiddleware.validateAccessToken,
+  finderMiddleware.findPost,
+  checkerMiddleware.checkPostStatusPermission,
+  finderMiddleware.findComment,
+  commentController.replyComment,
+);
+
+// like comment
+route.get(
+  '/:commentId(\\d+)/like',
+  validateMiddleware.validateAccessToken,
+  finderMiddleware.findPost,
+  checkerMiddleware.checkPostStatusPermission,
+  finderMiddleware.findComment,
+  commentController.likeComment,
+);
+
+// get comment likes
+route.get(
+  '/:commentId(\\d+)/likes',
+  validateMiddleware.identify,
+  finderMiddleware.findPost,
+  checkerMiddleware.checkPostStatusPermission,
+  finderMiddleware.findComment,
+  commentController.getCommentLikes,
+);
 
 module.exports = route;
