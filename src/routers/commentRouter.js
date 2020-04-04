@@ -8,14 +8,14 @@ const ownerMiddleware = require('../middlewares/ownerMiddleware');
 const checkerMiddleware = require('../middlewares/checkerMiddleware');
 const finderMiddleware = require('../middlewares/finderMiddleware');
 
-const route = express.Router({ mergeParams: true });
+const router = express.Router({ mergeParams: true });
 
-route.use(express.json());
-route.use(express.urlencoded({ extended: false }));
-route.use(cookieParser());
+router.use(express.json());
+router.use(express.urlencoded({ extended: false }));
+router.use(cookieParser());
 
 // create comment
-route.post(
+router.post(
   '/',
   validateMiddleware.validateAccessToken,
   finderMiddleware.findPost,
@@ -24,7 +24,7 @@ route.post(
 );
 
 // update comment
-route.patch(
+router.patch(
   '/:commentId(\\d+)',
   validateMiddleware.validateAccessToken,
   finderMiddleware.findPost,
@@ -35,7 +35,7 @@ route.patch(
 );
 
 // delete comment
-route.delete(
+router.delete(
   '/:commentId(\\d+)',
   validateMiddleware.validateAccessToken,
   finderMiddleware.findPost,
@@ -46,7 +46,7 @@ route.delete(
 );
 
 // get post comment
-route.get(
+router.get(
   '/',
   validateMiddleware.identify,
   finderMiddleware.findPost,
@@ -55,7 +55,7 @@ route.get(
 );
 
 // reply comment
-route.post(
+router.post(
   '/:commentId(\\d+)/reply',
   validateMiddleware.validateAccessToken,
   finderMiddleware.findPost,
@@ -65,7 +65,7 @@ route.post(
 );
 
 // like comment
-route.get(
+router.get(
   '/:commentId(\\d+)/like',
   validateMiddleware.validateAccessToken,
   finderMiddleware.findPost,
@@ -75,7 +75,7 @@ route.get(
 );
 
 // get comment likes
-route.get(
+router.get(
   '/:commentId(\\d+)/likes',
   validateMiddleware.identify,
   finderMiddleware.findPost,
@@ -84,4 +84,4 @@ route.get(
   commentController.getCommentLikes,
 );
 
-module.exports = route;
+module.exports = router;

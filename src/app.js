@@ -3,11 +3,10 @@ const morgan = require('morgan');
 
 const errorHandler = require('./utils/errorHandler');
 
-const authRoute = require('./routes/authRoute');
-const userRoute = require('./routes/userRoute');
-const friendRoute = require('./routes/friendRoute');
-const postRoute = require('./routes/postRoute');
-const commentRoute = require('./routes/commentRoute');
+const authRouter = require('./routers/authRouter');
+const userRouter = require('./routers/userRouter');
+const friendRouter = require('./routers/friendRouter');
+const postRouter = require('./routers/postRouter');
 
 const staticRoute = require('./static');
 
@@ -25,11 +24,10 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use('/api/v1/auth', authRoute);
-app.use('/api/v1/users', userRoute);
-app.use('/api/v1/friends', friendRoute);
-app.use('/api/v1/posts', postRoute);
-app.use('/api/v1/comments', commentRoute);
+app.use('/api/v1/auth', authRouter);
+app.use('/api/v1/users', userRouter);
+app.use('/api/v1/friends', friendRouter);
+app.use('/api/v1/posts', postRouter);
 app.use('/static', staticRoute);
 
 app.use(errorHandler);

@@ -8,7 +8,7 @@ const validateMiddleware = require('../middlewares/validateMiddleware');
 
 const ErrorResponse = require('../utils/errorResponse');
 
-const route = express.Router();
+const router = express.Router();
 
 const upload = multer({
   storage: multer.memoryStorage(),
@@ -20,39 +20,39 @@ const upload = multer({
   },
 });
 
-route.use(express.json());
-route.use(express.urlencoded({ extended: false }));
-route.use(cookieParser());
+router.use(express.json());
+router.use(express.urlencoded({ extended: false }));
+router.use(cookieParser());
 
 // get user post
-route.get(
+router.get(
   '/:username/posts',
   validateMiddleware.identify,
   userController.getPost,
 );
 
 // get own friend request
-route.get(
+router.get(
   '/requests',
   validateMiddleware.validateAccessToken,
   userController.getFriendsRequest,
 );
 
 // get own post
-route.get(
+router.get(
   '/posts',
   validateMiddleware.validateAccessToken,
   userController.getOwnPost,
 );
 
 // get user
-route.get('/:username', userController.getUser);
+router.get('/:username', userController.getUser);
 
 // get friend
-route.get('/:username/friends', userController.getFriends);
+router.get('/:username/friends', userController.getFriends);
 
 // update user
-route.patch(
+router.patch(
   '/info/',
   validateMiddleware.validateAccessToken,
   upload.single('avatar'),
@@ -60,10 +60,10 @@ route.patch(
 );
 
 // update password
-route.patch(
+router.patch(
   '/password',
   validateMiddleware.validateAccessToken,
   userController.updatePassword,
 );
 
-module.exports = route;
+module.exports = router;

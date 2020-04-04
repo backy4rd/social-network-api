@@ -7,40 +7,40 @@ const validateMiddleware = require('../middlewares/validateMiddleware');
 
 const mySession = require('../utils/mySession');
 
-const route = express.Router();
+const router = express.Router();
 
-route.use(express.json());
-route.use(express.urlencoded({ extended: false }));
-route.use(cookieParser());
+router.use(express.json());
+router.use(express.urlencoded({ extended: false }));
+router.use(cookieParser());
 
 // register
-route.post('/register', authController.register);
+router.post('/register', authController.register);
 
 // login
-route.post('/login', authController.login);
+router.post('/login', authController.login);
 
 // verify account
-route.get('/verify', authController.verifyVerificationMail);
+router.get('/verify', authController.verifyVerificationMail);
 
 // reset password
-route.post(
+router.post(
   '/resetPassword',
   mySession('forgotCode'),
   authController.resetPassword,
 );
 
 // send verification mail
-route.get(
+router.get(
   '/sendMail',
   validateMiddleware.validateAccessToken,
   authController.sendVerificationMail,
 );
 
 // send forgot password mail
-route.get(
+router.get(
   '/sendForgotMail',
   mySession('forgotCode', { expire: 4 * 1000 }),
   authController.sendForgotMail,
 );
 
-module.exports = route;
+module.exports = router;

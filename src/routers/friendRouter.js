@@ -6,14 +6,14 @@ const friendController = require('../controllers/friendController');
 const validateMiddleware = require('../middlewares/validateMiddleware');
 const finderMiddleware = require('../middlewares/finderMiddleware');
 
-const route = express.Router();
+const router = express.Router();
 
-route.use(cookieParser());
-route.use(validateMiddleware.validateAccessToken);
-route.use(finderMiddleware.findTarget);
+router.use(cookieParser());
+router.use(validateMiddleware.validateAccessToken);
+router.use(finderMiddleware.findTarget);
 
 // add friend
-route.get(
+router.get(
   '/add',
   validateMiddleware.validateAccessToken,
   finderMiddleware.findTarget,
@@ -21,7 +21,7 @@ route.get(
 );
 
 // unfriend
-route.get(
+router.get(
   '/breakup',
   validateMiddleware.validateAccessToken,
   finderMiddleware.findTarget,
@@ -29,7 +29,7 @@ route.get(
 );
 
 // decide friend request
-route.get(
+router.get(
   '/decide',
   validateMiddleware.validateAccessToken,
   finderMiddleware.findTarget,
@@ -37,11 +37,11 @@ route.get(
 );
 
 // unsend friend request
-route.get(
+router.get(
   '/unsend',
   validateMiddleware.validateAccessToken,
   finderMiddleware.findTarget,
   friendController.unsend,
 );
 
-module.exports = route;
+module.exports = router;

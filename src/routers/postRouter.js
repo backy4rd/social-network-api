@@ -2,7 +2,7 @@ const express = require('express');
 const cookieParser = require('cookie-parser');
 const multer = require('multer');
 
-const commentRoute = require('./commentRoute');
+const commentRouter = require('./commentRouter');
 
 const postController = require('../controllers/postController');
 
@@ -13,7 +13,7 @@ const finderMiddleware = require('../middlewares/finderMiddleware');
 
 const ErrorResponse = require('../utils/errorResponse');
 
-const route = express.Router();
+const router = express.Router();
 
 const upload = multer({
   storage: multer.memoryStorage(),
@@ -25,14 +25,14 @@ const upload = multer({
   },
 });
 
-route.use(express.json());
-route.use(express.urlencoded({ extended: false }));
-route.use(cookieParser());
+router.use(express.json());
+router.use(express.urlencoded({ extended: false }));
+router.use(cookieParser());
 
-route.use('/:postId(\\d+)/comments', commentRoute);
+router.use('/:postId(\\d+)/comments', commentRouter);
 
 // create post
-route.post(
+router.post(
   '/',
   upload.array('photos', 20),
   validateMiddleware.validateAccessToken,
@@ -40,7 +40,7 @@ route.post(
 );
 
 // update post
-route.patch(
+router.patch(
   '/:postId(\\d+)',
   validateMiddleware.validateAccessToken,
   finderMiddleware.findPost,
@@ -50,7 +50,7 @@ route.patch(
 );
 
 // delete post
-route.delete(
+router.delete(
   '/:postId(\\d+)',
   validateMiddleware.validateAccessToken,
   finderMiddleware.findPost,
@@ -59,7 +59,7 @@ route.delete(
 );
 
 // get post
-route.get(
+router.get(
   '/:postId(\\d+)',
   validateMiddleware.identify,
   finderMiddleware.findPost,
@@ -68,7 +68,7 @@ route.get(
 );
 
 // like post
-route.get(
+router.get(
   '/:postId(\\d+)/like',
   validateMiddleware.validateAccessToken,
   finderMiddleware.findPost,
@@ -77,7 +77,7 @@ route.get(
 );
 
 // get like of post
-route.get(
+router.get(
   '/:postId(\\d+)/likes',
   validateMiddleware.identify,
   finderMiddleware.findPost,
@@ -85,4 +85,4 @@ route.get(
   postController.getLikes,
 );
 
-module.exports = route;
+module.exports = router;
