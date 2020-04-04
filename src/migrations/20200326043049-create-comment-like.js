@@ -2,7 +2,7 @@ module.exports = {
   up: (queryInterface, Sequelize) => {
     return queryInterface.createTable('CommentLikes', {
       liker: {
-        type: Sequelize.STRING,
+        type: Sequelize.STRING(32),
         primaryKey: true,
         references: {
           model: 'Users',

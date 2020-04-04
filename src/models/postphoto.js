@@ -3,7 +3,7 @@ module.exports = (sequelize, DataTypes) => {
     'PostPhoto',
     {
       postId: { type: DataTypes.INTEGER, validate: { isInt: true } },
-      photo: { type: DataTypes.STRING, unique: true },
+      photo: { type: DataTypes.STRING(128), unique: true },
     },
     { timestamps: false },
   );

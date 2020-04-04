@@ -168,7 +168,6 @@ module.exports.getFriends = asyncHandler(async (req, res, next) => {
     include: {
       model: User,
       attributes: { exclude: ['password'] },
-      as: 'target',
     },
   });
 

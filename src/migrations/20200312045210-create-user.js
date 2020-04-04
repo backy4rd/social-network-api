@@ -3,20 +3,20 @@ module.exports = {
     return queryInterface
       .createTable('Users', {
         username: {
-          type: Sequelize.STRING,
+          type: Sequelize.STRING(32),
           allowNull: false,
           primaryKey: true,
         },
         password: {
-          type: Sequelize.STRING,
+          type: Sequelize.STRING(80),
           allowNull: false,
         },
         fullName: {
-          type: Sequelize.STRING,
+          type: Sequelize.STRING(64) + ' CHARSET utf8 COLLATE utf8_unicode_ci',
           allowNull: false,
         },
         email: {
-          type: Sequelize.STRING,
+          type: Sequelize.STRING(64),
           allowNull: false,
         },
         female: {
@@ -24,7 +24,7 @@ module.exports = {
           allowNull: false,
         },
         avatar: {
-          type: Sequelize.STRING,
+          type: Sequelize.STRING(128),
           defaultValue: 'avatars/default.jpg',
           allowNull: false,
         },

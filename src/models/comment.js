@@ -10,14 +10,17 @@ module.exports = (sequelize, DataTypes) => {
         },
       },
       commenter: {
-        type: DataTypes.STRING,
+        type: DataTypes.STRING(32),
         allowNull: false,
         validate: {
           is: { args: /^[A-z0-9_.]+$/, msg: 'invalid username' },
           len: { args: [5, 32], msg: 'username length must around 5-32' },
         },
       },
-      content: { type: DataTypes.STRING, allowNull: false },
+      content: {
+        type: DataTypes.STRING(1024) + ' CHARSET utf8 COLLATE utf8_unicode_ci',
+        allowNull: false,
+      },
       like: {
         type: DataTypes.INTEGER,
         defaultValue: 0,

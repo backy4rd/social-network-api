@@ -6,7 +6,7 @@ module.exports = (sequelize, DataTypes) => {
     'User',
     {
       username: {
-        type: DataTypes.STRING,
+        type: DataTypes.STRING(32),
         primaryKey: true,
         validate: {
           is: { args: /^[A-z0-9_.]+$/, msg: 'invalid username' },
@@ -14,7 +14,7 @@ module.exports = (sequelize, DataTypes) => {
         },
       },
       password: {
-        type: DataTypes.STRING,
+        type: DataTypes.STRING(80),
         allowNull: false,
         validate: {
           not: { args: /\s/, msg: 'password can not contain white space' },
@@ -22,7 +22,7 @@ module.exports = (sequelize, DataTypes) => {
         },
       },
       fullName: {
-        type: DataTypes.STRING,
+        type: DataTypes.STRING(64) + ' CHARSET utf8 COLLATE utf8_unicode_ci',
         allowNull: false,
         validate: {
           is: { args: /^[A-z][A-z._\s]+[A-z]$/, msg: 'invalid name' },
@@ -34,14 +34,14 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
       },
       email: {
-        type: DataTypes.STRING,
+        type: DataTypes.STRING(64),
         allowNull: false,
         validate: {
           isEmail: { args: true, msg: 'invalid email' },
         },
       },
       avatar: {
-        type: DataTypes.STRING,
+        type: DataTypes.STRING(128),
         defaultValue: 'avatars/default.jpg',
         allowNull: false,
       },

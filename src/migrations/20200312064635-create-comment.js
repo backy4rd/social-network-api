@@ -17,7 +17,7 @@ module.exports = {
         onDelete: 'CASCADE',
       },
       commenter: {
-        type: Sequelize.STRING,
+        type: Sequelize.STRING(32),
         allowNull: false,
         references: {
           model: 'Users',
@@ -25,7 +25,10 @@ module.exports = {
         },
         onDelete: 'CASCADE',
       },
-      content: { type: Sequelize.STRING, allowNull: false },
+      content: {
+        type: Sequelize.STRING(1024) + ' CHARSET utf8 COLLATE utf8_unicode_ci',
+        allowNull: false,
+      },
       like: {
         type: Sequelize.INTEGER,
         defaultValue: 0,

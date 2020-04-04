@@ -3,7 +3,7 @@ module.exports = (sequelize, DataTypes) => {
     'CommentLike',
     {
       liker: {
-        type: DataTypes.STRING,
+        type: DataTypes.STRING(32),
         primaryKey: true,
         validate: {
           is: { args: /^[A-z0-9_.]+$/, msg: 'invalid username' },

@@ -3,7 +3,7 @@ module.exports = (sequelize, DataTypes) => {
     'Friend',
     {
       userA: {
-        type: DataTypes.STRING,
+        type: DataTypes.STRING(32),
         primaryKey: true,
         validate: {
           is: { args: /^[A-z0-9_.]+$/, msg: 'invalid username' },
@@ -11,7 +11,7 @@ module.exports = (sequelize, DataTypes) => {
         },
       },
       userB: {
-        type: DataTypes.STRING,
+        type: DataTypes.STRING(32),
         primaryKey: true,
         validate: {
           is: { args: /^[A-z0-9_.]+$/, msg: 'invalid username' },
@@ -19,7 +19,7 @@ module.exports = (sequelize, DataTypes) => {
         },
       },
       status: {
-        type: DataTypes.STRING,
+        type: DataTypes.STRING(10),
         allowNull: false,
         validate: {
           is: {
@@ -37,7 +37,6 @@ module.exports = (sequelize, DataTypes) => {
       foreignKey: 'userB',
       sourceKey: 'username',
       targetKey: 'username',
-      as: 'target',
     });
   };
 

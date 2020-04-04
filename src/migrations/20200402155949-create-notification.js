@@ -8,7 +8,7 @@ module.exports = {
         type: Sequelize.INTEGER,
       },
       owner: {
-        type: Sequelize.STRING,
+        type: Sequelize.STRING(32),
         allowNull: false,
         references: {
           model: 'Users',
@@ -17,7 +17,7 @@ module.exports = {
         onDelete: 'CASCADE',
       },
       from: {
-        type: Sequelize.STRING,
+        type: Sequelize.STRING(32),
         allowNull: false,
         references: {
           model: 'Users',
@@ -42,7 +42,7 @@ module.exports = {
         onDelete: 'CASCADE',
       },
       action: {
-        type: Sequelize.STRING,
+        type: Sequelize.STRING(10),
         allowNull: false,
       },
       createdAt: {

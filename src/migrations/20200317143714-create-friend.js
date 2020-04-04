@@ -2,7 +2,7 @@ module.exports = {
   up: (queryInterface, Sequelize) => {
     return queryInterface.createTable('Friends', {
       userA: {
-        type: Sequelize.STRING,
+        type: Sequelize.STRING(32),
         primaryKey: true,
         references: {
           model: 'Users',
@@ -11,7 +11,7 @@ module.exports = {
         onDelete: 'CASCADE',
       },
       userB: {
-        type: Sequelize.STRING,
+        type: Sequelize.STRING(32),
         primaryKey: true,
         references: {
           model: 'Users',
@@ -20,7 +20,7 @@ module.exports = {
         onDelete: 'CASCADE',
       },
       status: {
-        type: Sequelize.STRING,
+        type: Sequelize.STRING(10),
         allowNull: false,
       },
       createdAt: {

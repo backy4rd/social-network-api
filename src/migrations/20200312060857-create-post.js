@@ -8,7 +8,7 @@ module.exports = {
         type: Sequelize.INTEGER,
       },
       createdBy: {
-        type: Sequelize.STRING,
+        type: Sequelize.STRING(32),
         allowNull: false,
         references: {
           model: 'Users',
@@ -17,10 +17,10 @@ module.exports = {
         onDelete: 'CASCADE',
       },
       content: {
-        type: Sequelize.STRING,
+        type: Sequelize.STRING(1024) + ' CHARSET utf8 COLLATE utf8_unicode_ci',
       },
       status: {
-        type: Sequelize.STRING,
+        type: Sequelize.STRING(10),
         defaultValue: 'public',
         allowNull: false,
       },

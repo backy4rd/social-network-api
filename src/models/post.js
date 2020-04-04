@@ -3,7 +3,7 @@ module.exports = (sequelize, DataTypes) => {
     'Post',
     {
       createdBy: {
-        type: DataTypes.STRING,
+        type: DataTypes.STRING(32),
         allowNull: false,
         validate: {
           is: { args: /^[A-z0-9_.]+$/, msg: 'invalid username' },
@@ -11,10 +11,10 @@ module.exports = (sequelize, DataTypes) => {
         },
       },
       content: {
-        type: DataTypes.STRING,
+        type: DataTypes.STRING(1024) + ' CHARSET utf8 COLLATE utf8_unicode_ci',
       },
       status: {
-        type: DataTypes.STRING,
+        type: DataTypes.STRING(10),
         defaultValue: 'public',
         allowNull: false,
         validate: {

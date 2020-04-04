@@ -3,7 +3,7 @@ module.exports = (sequelize, DataTypes) => {
     'Notification',
     {
       owner: {
-        type: DataTypes.STRING,
+        type: DataTypes.STRING(32),
         allowNull: false,
         validate: {
           is: { args: /^[A-z0-9_.]+$/, msg: 'invalid username' },
@@ -11,7 +11,7 @@ module.exports = (sequelize, DataTypes) => {
         },
       },
       from: {
-        type: DataTypes.STRING,
+        type: DataTypes.STRING(32),
         allowNull: false,
         validate: {
           is: { args: /^[A-z0-9_.]+$/, msg: 'invalid username' },
@@ -27,7 +27,7 @@ module.exports = (sequelize, DataTypes) => {
         validate: { isInt: true },
       },
       action: {
-        type: DataTypes.STRING,
+        type: DataTypes.STRING(10),
         allowNull: false,
         validate: {
           is: /^(comment)|(like)$/,

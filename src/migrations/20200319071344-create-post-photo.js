@@ -16,7 +16,7 @@ module.exports = {
         onDelete: 'CASCADE',
       },
       photo: {
-        type: Sequelize.STRING,
+        type: Sequelize.STRING(128),
         unique: true,
       },
     });
