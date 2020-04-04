@@ -7,6 +7,7 @@ const authRouter = require('./routers/authRouter');
 const userRouter = require('./routers/userRouter');
 const friendRouter = require('./routers/friendRouter');
 const postRouter = require('./routers/postRouter');
+const notificationRouter = require('./routers/notificationRouter');
 
 const staticRoute = require('./static');
 
@@ -28,6 +29,7 @@ app.use('/api/v1/auth', authRouter);
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/friends', friendRouter);
 app.use('/api/v1/posts', postRouter);
+app.use('/api/v1/notifications', notificationRouter);
 app.use('/static', staticRoute);
 
 app.use(errorHandler);

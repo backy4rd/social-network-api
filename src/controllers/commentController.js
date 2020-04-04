@@ -2,6 +2,7 @@ const { User, Comment, CommentLike, Notification } = require('../models');
 const asyncHandler = require('../utils/asyncHandler');
 const ErrorResponse = require('../utils/errorResponse');
 const requestHandler = require('../utils/requestHandler');
+const responseHander = require('../utils/responseHander');
 
 module.exports.createComment = asyncHandler(async (req, res, next) => {
   const { post } = req;
@@ -43,12 +44,12 @@ module.exports.getPostComments = asyncHandler(async (req, res, next) => {
     offset: from,
     limit: limit,
     order: ['id'],
-    include: { model: User, attributes: ['fullName'] },
+    include: { model: User, attributes: ['fullName', 'avatar'] },
   });
 
   res.status(200).json({
     status: 'success',
-    data: comments,
+    data: responseHander.processComment(comments),
   });
 });
 
@@ -71,7 +72,6 @@ module.exports.updateComment = asyncHandler(async (req, res, next) => {
 
 module.exports.deleteComment = asyncHandler(async (req, res, next) => {
   const { comment } = req;
-  const { username } = req.user;
 
   await comment.destroy();
 

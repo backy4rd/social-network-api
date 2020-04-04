@@ -58,3 +58,25 @@ module.exports.processFriend = friends => {
 
   return res;
 };
+
+module.exports.processNotification = notifications => {
+  const res = notifications;
+
+  res.forEach(notification => {
+    const { User: user } = notification;
+    user.dataValues.avatar = url.resolve(staticUrl, user.dataValues.avatar);
+  });
+
+  return res;
+};
+
+module.exports.processComment = comments => {
+  const res = comments;
+
+  res.forEach(comment => {
+    const { User: user } = comment;
+    user.dataValues.avatar = url.resolve(staticUrl, user.dataValues.avatar);
+  });
+
+  return res;
+};
