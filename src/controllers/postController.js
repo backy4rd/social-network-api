@@ -1,14 +1,7 @@
 const fs = require('fs');
 const sharp = require('sharp');
 
-const {
-  User,
-  Post,
-  PostPhoto,
-  Like,
-  Comment,
-  Notification,
-} = require('../models');
+const { User, Post, PostPhoto, Like, Notification } = require('../models');
 const asyncHandler = require('../utils/asyncHandler');
 const ErrorResponse = require('../utils/errorResponse');
 const responseHander = require('../utils/responseHander');
@@ -205,55 +198,6 @@ module.exports.getLikes = asyncHandler(async (req, res, next) => {
   res.status(200).json({
     status: 'success',
     data: likes,
-  });
-});
-
-module.exports.createComment = asyncHandler(async (req, res, next) => {
-  const { post } = req;
-  const { username } = req.user;
-  const { content } = req.body;
-
-  if (!content) {
-    return next(new ErrorResponse('missing parameters', 400));
-  }
-
-  const newComment = await Comment.create({
-    commenter: username,
-    postId: post.id,
-    content: content,
-  });
-
-  if (post.createdBy !== username) {
-    await Notification.create({
-      owner: post.createdBy,
-      from: username,
-      postId: post.id,
-      action: 'comment',
-    });
-  }
-
-  res.status(201).json({
-    status: 'success',
-    data: newComment,
-  });
-});
-
-module.exports.getComments = asyncHandler(async (req, res, next) => {
-  const { post } = req;
-  const { from, limit } = requestHandler.range(req, [20, 50]);
-
-  // id represent createAt
-  const comments = await post.getComments({
-    where: { replyOf: null },
-    offset: from,
-    limit: limit,
-    order: ['id'],
-    include: { model: User, attributes: ['fullName'] },
-  });
-
-  res.status(200).json({
-    status: 'success',
-    data: comments,
   });
 });
 
