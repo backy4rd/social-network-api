@@ -43,13 +43,30 @@ module.exports.getPostComments = asyncHandler(async (req, res, next) => {
     where: { replyOf: null },
     offset: from,
     limit: limit,
-    order: ['id'],
+    order: ['createdAt'],
     include: { model: User, attributes: ['fullName', 'avatar'] },
   });
 
   res.status(200).json({
     status: 'success',
     data: responseHander.processComment(comments),
+  });
+});
+
+module.exports.getReplyComments = asyncHandler(async (req, res, next) => {
+  const { comment } = req;
+  const { from, limit } = requestHandler.range(req, [20, 50]);
+
+  const replies = await comment.getReplies({
+    offset: from,
+    limit: limit,
+    order: ['createdAt'],
+    include: { model: User, attributes: ['fullName', 'avatar'] },
+  });
+
+  res.status(200).json({
+    status: 'success',
+    data: responseHander.processComment(replies),
   });
 });
 

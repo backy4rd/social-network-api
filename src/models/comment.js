@@ -52,6 +52,12 @@ module.exports = (sequelize, DataTypes) => {
       targetKey: 'id',
     });
 
+    Comment.hasMany(Comment, {
+      foreignKey: 'replyOf',
+      sourceKey: 'id',
+      as: 'replies',
+    });
+
     Comment.hasMany(models.CommentLike, {
       foreignKey: 'commentId',
       sourceKey: 'id',

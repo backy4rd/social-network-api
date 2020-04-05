@@ -64,6 +64,16 @@ router.post(
   commentController.replyComment,
 );
 
+// get reply comment
+router.get(
+  '/:commentId(\\d+)/replies',
+  validateMiddleware.identify,
+  finderMiddleware.findPost,
+  checkerMiddleware.checkPostStatusPermission,
+  finderMiddleware.findComment,
+  commentController.getReplyComments,
+);
+
 // like comment
 router.get(
   '/:commentId(\\d+)/like',
