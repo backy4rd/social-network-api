@@ -32,7 +32,7 @@ router.post(
 // send verification mail
 router.get(
   '/sendMail',
-  validateMiddleware.validateAccessToken,
+  validateMiddleware.authorize,
   authController.sendVerificationMail,
 );
 

@@ -35,14 +35,14 @@ router.use('/:postId(\\d+)/comments', commentRouter);
 router.post(
   '/',
   upload.array('photos', 20),
-  validateMiddleware.validateAccessToken,
+  validateMiddleware.authorize,
   postController.createPost,
 );
 
 // update post
 router.patch(
   '/:postId(\\d+)',
-  validateMiddleware.validateAccessToken,
+  validateMiddleware.authorize,
   finderMiddleware.findPost,
   ownerMiddleware.ownerPost,
   upload.array('photos', 20),
@@ -52,7 +52,7 @@ router.patch(
 // delete post
 router.delete(
   '/:postId(\\d+)',
-  validateMiddleware.validateAccessToken,
+  validateMiddleware.authorize,
   finderMiddleware.findPost,
   ownerMiddleware.ownerPost,
   postController.deletePost,
@@ -70,7 +70,7 @@ router.get(
 // like post
 router.get(
   '/:postId(\\d+)/like',
-  validateMiddleware.validateAccessToken,
+  validateMiddleware.authorize,
   finderMiddleware.findPost,
   checkerMiddleware.checkPostStatusPermission,
   postController.like,

@@ -34,16 +34,12 @@ router.get(
 // get own friend request
 router.get(
   '/requests',
-  validateMiddleware.validateAccessToken,
+  validateMiddleware.authorize,
   userController.getFriendsRequest,
 );
 
 // get own post
-router.get(
-  '/posts',
-  validateMiddleware.validateAccessToken,
-  userController.getOwnPost,
-);
+router.get('/posts', validateMiddleware.authorize, userController.getOwnPost);
 
 // get user
 router.get('/:username', userController.getUser);
@@ -54,7 +50,7 @@ router.get('/:username/friends', userController.getFriends);
 // update user
 router.patch(
   '/info/',
-  validateMiddleware.validateAccessToken,
+  validateMiddleware.authorize,
   upload.single('avatar'),
   userController.updateUser,
 );
@@ -62,7 +58,7 @@ router.patch(
 // update password
 router.patch(
   '/password',
-  validateMiddleware.validateAccessToken,
+  validateMiddleware.authorize,
   userController.updatePassword,
 );
 

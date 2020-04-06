@@ -51,9 +51,9 @@ module.exports.processFriend = friends => {
   const res = friends;
 
   res.forEach(friend => {
-    const { target } = friend;
-    target.dataValues.avatar = url.resolve(staticUrl, target.dataValues.avatar);
-    delete target.dataValues.password;
+    const { User } = friend;
+    User.dataValues.avatar = url.resolve(staticUrl, User.dataValues.avatar);
+    delete User.dataValues.password;
   });
 
   return res;

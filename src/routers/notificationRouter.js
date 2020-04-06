@@ -12,7 +12,7 @@ router.use(cookieParser());
 // get own notification
 router.get(
   '/',
-  validateMiddleware.validateAccessToken,
+  validateMiddleware.authorize,
   notificationController.getNotification,
 );
 

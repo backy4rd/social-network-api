@@ -2,7 +2,7 @@ const jwt = require('jsonwebtoken');
 const asyncHandler = require('../utils/asyncHandler');
 const ErrorResponse = require('../utils/errorResponse');
 
-module.exports.validateAccessToken = asyncHandler((req, res, next) => {
+module.exports.authorize = asyncHandler((req, res, next) => {
   const { token } = req.cookies;
   const secret = process.env.SECRET;
 

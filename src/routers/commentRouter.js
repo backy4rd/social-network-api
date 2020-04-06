@@ -17,7 +17,7 @@ router.use(cookieParser());
 // create comment
 router.post(
   '/',
-  validateMiddleware.validateAccessToken,
+  validateMiddleware.authorize,
   finderMiddleware.findPost,
   checkerMiddleware.checkPostStatusPermission,
   commentController.createComment,
@@ -26,7 +26,7 @@ router.post(
 // update comment
 router.patch(
   '/:commentId(\\d+)',
-  validateMiddleware.validateAccessToken,
+  validateMiddleware.authorize,
   finderMiddleware.findPost,
   checkerMiddleware.checkPostStatusPermission,
   finderMiddleware.findComment,
@@ -37,7 +37,7 @@ router.patch(
 // delete comment
 router.delete(
   '/:commentId(\\d+)',
-  validateMiddleware.validateAccessToken,
+  validateMiddleware.authorize,
   finderMiddleware.findPost,
   checkerMiddleware.checkPostStatusPermission,
   finderMiddleware.findComment,
@@ -57,7 +57,7 @@ router.get(
 // reply comment
 router.post(
   '/:commentId(\\d+)/reply',
-  validateMiddleware.validateAccessToken,
+  validateMiddleware.authorize,
   finderMiddleware.findPost,
   checkerMiddleware.checkPostStatusPermission,
   finderMiddleware.findComment,
@@ -77,7 +77,7 @@ router.get(
 // like comment
 router.get(
   '/:commentId(\\d+)/like',
-  validateMiddleware.validateAccessToken,
+  validateMiddleware.authorize,
   finderMiddleware.findPost,
   checkerMiddleware.checkPostStatusPermission,
   finderMiddleware.findComment,

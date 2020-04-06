@@ -162,12 +162,13 @@ module.exports.getFriends = asyncHandler(async (req, res, next) => {
 
   const friends = await Friend.findAll({
     where: { [Op.and]: [{ userA: username }, { status: 'friend' }] },
+    attributes: [['userB', 'friend'], 'status', 'createdAt', 'updatedAt'],
     offset: from,
     limit: limit,
     order: ['createdAt'],
     include: {
       model: User,
-      attributes: { exclude: ['password'] },
+      attributes: ['fullName', 'avatar'],
     },
   });
 
@@ -183,13 +184,13 @@ module.exports.getFriendsRequest = asyncHandler(async (req, res, next) => {
 
   const friendRequests = await Friend.findAll({
     where: { [Op.and]: [{ userA: username }, { status: 'pending' }] },
+    attributes: [['userB', 'from'], 'status', 'createdAt', 'updatedAt'],
     offset: from,
     limit: limit,
     order: ['createdAt'],
     include: {
       model: User,
-      attributes: { exclude: ['password'] },
-      as: 'target',
+      attributes: ['fullName', 'avatar'],
     },
   });
 
