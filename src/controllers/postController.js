@@ -60,6 +60,7 @@ module.exports.createPost = asyncHandler(async (req, res, next) => {
 });
 
 module.exports.updatePost = asyncHandler(async (req, res, next) => {
+  const { username } = req.user;
   const { removePhotos, content, status } = req.body;
   const { post } = req;
   const files = req.files || [];
@@ -78,27 +79,31 @@ module.exports.updatePost = asyncHandler(async (req, res, next) => {
   await post.validate();
 
   if (removePhotos) {
-    // filter to get only owner photo
-    const filteredPhotos = removePhotos
-      .split(',')
-      .map(removeId => {
-        return post.photos.find(photo => photo.id === parseInt(removeId, 10));
-      })
-      .filter(photo => photo);
+    const removePhotoList = await post.getPhotos({
+      where: {
+        postId: post.id,
+        id: removePhotos.split(','),
+      },
+    });
 
-    if (filteredPhotos.length !== 0) {
-      await PostPhoto.destroy({
-        where: { id: filteredPhotos.map(photo => photo.id) },
-      });
-
-      filteredPhotos.forEach(photo => {
+    if (removePhotoList.length !== 0) {
+      // remove from storage
+      removePhotoList.forEach(photo => {
         fs.unlink(`./static/${photo.photo}`, err => {
           if (err) console.log(err);
         });
       });
 
+      // remove from database
+      await PostPhoto.destroy({
+        where: {
+          id: removePhotoList.map(photo => photo.id),
+        },
+      });
+
+      // remove from response
       post.dataValues.photos = post.photos.filter(photo => {
-        return filteredPhotos.indexOf(photo) === -1;
+        return !removePhotoList.find(pt => pt.id === photo.id);
       });
     }
   }
