@@ -1,6 +1,11 @@
+const fs = require('fs');
+
+const nodeEnv = process.env.NODE_ENV;
+
+const logStream = fs.createWriteStream('./src/server.log', { flags: 'a' });
+
 module.exports = (err, req, res, next) => {
-  console.log(err.stack);
-  if (/Sequelize/.test(err.name)) {
+  if (/Validation error/.test(err)) {
     return res.status(400).json({
       status: 'fail',
       data: err.message.split(',\n'),
@@ -8,15 +13,19 @@ module.exports = (err, req, res, next) => {
   }
 
   if (!err.statusCode) {
+    if (nodeEnv === 'production') {
+      logStream.write(`[${Date()}]:  ${err.stack}\n\n`);
+    }
+    if (nodeEnv === 'development') {
+      console.log(err.stack);
+    }
+
     return res.status(500).json({
       status: 'error',
       data: 'internal server error',
     });
   }
 
-  if (process.env.NODE_ENV === 'development') {
-    console.log(err.stack);
-  }
   res.status(err.statusCode).json({
     status: 'fail',
     data: err.message,
