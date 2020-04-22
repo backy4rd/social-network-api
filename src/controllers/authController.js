@@ -90,7 +90,7 @@ module.exports.sendVerificationMail = asyncHandler(async (req, res, next) => {
   });
 
   transporter.sendMail(mailOptions, err => {
-    if (err) console.log(err);
+    if (err) next(err);
   });
 });
 
@@ -161,7 +161,7 @@ module.exports.sendForgotMail = asyncHandler(async (req, res, next) => {
   });
 
   transporter.sendMail(mailOptions, err => {
-    if (err) console.log(err);
+    if (err) next(err);
   });
 });
 

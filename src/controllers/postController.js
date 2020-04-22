@@ -60,7 +60,6 @@ module.exports.createPost = asyncHandler(async (req, res, next) => {
 });
 
 module.exports.updatePost = asyncHandler(async (req, res, next) => {
-  const { username } = req.user;
   const { removePhotos, content, status } = req.body;
   const { post } = req;
   const files = req.files || [];
@@ -89,9 +88,7 @@ module.exports.updatePost = asyncHandler(async (req, res, next) => {
     if (removePhotoList.length !== 0) {
       // remove from storage
       removePhotoList.forEach(photo => {
-        fs.unlink(`./static/${photo.photo}`, err => {
-          if (err) console.log(err);
-        });
+        fs.unlink(`./static/${photo.photo}`);
       });
 
       // remove from database
@@ -143,9 +140,7 @@ module.exports.deletePost = asyncHandler(async (req, res, next) => {
 
   // delete photo from storage
   photos.forEach(photo => {
-    fs.unlink(`./static/${photo.photo}`, err => {
-      if (err) console.log(err);
-    });
+    fs.unlink(`./static/${photo.photo}`);
   });
 
   await post.destroy();

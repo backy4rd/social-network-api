@@ -1,4 +1,3 @@
-const { Comment, Post, PostPhoto } = require('../models');
 const asyncHandler = require('../utils/asyncHandler');
 const ErrorResponse = require('../utils/errorResponse');
 

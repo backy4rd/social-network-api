@@ -15,7 +15,7 @@ const app = express();
 
 app.disable('etag');
 
-if (process.env.NODE_ENV !== 'test') {
+if (process.env.NODE_ENV !== 'production') {
   app.use(morgan('dev'));
 }
 

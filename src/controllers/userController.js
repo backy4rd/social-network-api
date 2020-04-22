@@ -51,9 +51,7 @@ module.exports.updateUser = asyncHandler(async (req, res, next) => {
 
     // remove previous avatar
     if (user.avatar !== 'avatars/default.jpg') {
-      fs.unlink(`./static/${user.avatar}`, err => {
-        if (err) console.log(err);
-      });
+      fs.unlink(`./static/${user.avatar}`);
     }
 
     // resize, convert type and save

@@ -20,6 +20,9 @@ module.exports = (err, req, res, next) => {
       console.log(err.stack);
     }
 
+    // prevent send multiple response
+    if (res.headerSent) return;
+
     return res.status(500).json({
       status: 'error',
       data: 'internal server error',
