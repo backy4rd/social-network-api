@@ -1,5 +1,6 @@
 const url = require('url');
 const jwt = require('jsonwebtoken');
+const axios = require('axios');
 
 const { User } = require('../models');
 const asyncHandler = require('../utils/asyncHandler');
@@ -192,4 +193,27 @@ module.exports.resetPassword = asyncHandler(async (req, res, next) => {
     status: 'success',
     data: 'reset password success',
   });
+});
+
+module.exports.OAuthGoogle = asyncHandler(async (req, res, next) => {
+  const tokenUrl = 'https://oauth2.googleapis.com/token';
+  const { data: token } = await axios.post(tokenUrl, {
+    code: req.query.code,
+    client_id: process.env.CLIENT_ID,
+    client_secret: process.env.CLIENT_SECRET,
+    redirect_uri: process.env.REDIRECT_URI,
+    grant_type: 'authorization_code',
+  });
+
+  const profileUrl = url.format({
+    protocol: 'https',
+    host: 'oauth2.googleapis.com',
+    pathname: '/tokeninfo',
+    query: {
+      id_token: token.id_token,
+    },
+  });
+  const { data: userInfo } = await axios.get(profileUrl);
+
+  res.json(userInfo);
 });

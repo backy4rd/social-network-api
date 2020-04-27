@@ -19,6 +19,9 @@ router.post('/register', authController.register);
 // login
 router.post('/login', authController.login);
 
+// login with google
+router.get('/oauth/google', authController.OAuthGoogle);
+
 // verify account
 router.get('/verify', authController.verifyVerificationMail);
 
