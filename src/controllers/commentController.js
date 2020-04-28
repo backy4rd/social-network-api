@@ -2,7 +2,7 @@ const { User, Comment, CommentLike, Notification } = require('../models');
 const asyncHandler = require('../utils/asyncHandler');
 const ErrorResponse = require('../utils/errorResponse');
 const requestHandler = require('../utils/requestHandler');
-const responseHander = require('../utils/responseHander');
+const responseHandler = require('../utils/responseHandler');
 
 module.exports.createComment = asyncHandler(async (req, res, next) => {
   const { post } = req;
@@ -49,7 +49,7 @@ module.exports.getPostComments = asyncHandler(async (req, res, next) => {
 
   res.status(200).json({
     status: 'success',
-    data: responseHander.processComment(comments),
+    data: responseHandler.processComment(comments),
   });
 });
 
@@ -66,7 +66,7 @@ module.exports.getReplyComments = asyncHandler(async (req, res, next) => {
 
   res.status(200).json({
     status: 'success',
-    data: responseHander.processComment(replies),
+    data: responseHandler.processComment(replies),
   });
 });
 
@@ -108,7 +108,7 @@ module.exports.replyComment = asyncHandler(async (req, res, next) => {
   }
 
   if (comment.replyOf !== null) {
-    return next(new ErrorResponse('unaccept nesting reply', 400));
+    return next(new ErrorResponse('unaccepted nesting reply', 400));
   }
 
   const replyComment = await Comment.create({
@@ -146,7 +146,7 @@ module.exports.likeComment = asyncHandler(async (req, res, next) => {
     await comment.increment({ like: -1 }, { where: { id: comment.id } });
     return res.status(200).json({
       status: 'success',
-      data: 'unliked',
+      data: 'unlike',
     });
   }
 
@@ -162,7 +162,7 @@ module.exports.likeComment = asyncHandler(async (req, res, next) => {
   await comment.increment({ like: 1 }, { where: { id: comment.id } });
   res.status(200).json({
     status: 'success',
-    data: 'liked',
+    data: 'like',
   });
 });
 

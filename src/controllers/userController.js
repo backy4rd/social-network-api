@@ -10,7 +10,7 @@ const {
 } = require('../models');
 const asyncHandler = require('../utils/asyncHandler');
 const ErrorResponse = require('../utils/errorResponse');
-const responseHander = require('../utils/responseHander');
+const responseHandler = require('../utils/responseHandler');
 const requestHandler = require('../utils/requestHandler');
 
 module.exports.getUser = asyncHandler(async (req, res, next) => {
@@ -24,7 +24,7 @@ module.exports.getUser = asyncHandler(async (req, res, next) => {
 
   res.status(200).json({
     status: 'success',
-    data: responseHander.processUser(user),
+    data: responseHandler.processUser(user),
   });
 });
 
@@ -67,7 +67,7 @@ module.exports.updateUser = asyncHandler(async (req, res, next) => {
 
   res.status(200).json({
     status: 'success',
-    data: responseHander.processUser(user),
+    data: responseHandler.processUser(user),
   });
 });
 
@@ -132,7 +132,7 @@ module.exports.getPost = asyncHandler(async (req, res, next) => {
 
   res.status(200).json({
     status: 'success',
-    data: responseHander.processPost(posts),
+    data: responseHandler.processPost(posts),
   });
 });
 
@@ -150,7 +150,7 @@ module.exports.getOwnPost = asyncHandler(async (req, res, next) => {
 
   res.status(200).json({
     status: 'success',
-    data: responseHander.processPost(posts),
+    data: responseHandler.processPost(posts),
   });
 });
 
@@ -172,7 +172,7 @@ module.exports.getFriends = asyncHandler(async (req, res, next) => {
 
   res.status(200).json({
     status: 'success',
-    data: responseHander.processFriend(friends),
+    data: responseHandler.processFriend(friends),
   });
 });
 
@@ -194,6 +194,6 @@ module.exports.getFriendsRequest = asyncHandler(async (req, res, next) => {
 
   res.status(200).json({
     status: 'success',
-    data: responseHander.processFriend(friendRequests),
+    data: responseHandler.processFriend(friendRequests),
   });
 });

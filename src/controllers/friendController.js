@@ -10,7 +10,7 @@ module.exports.addFriend = asyncHandler(async (req, res, next) => {
   const { target } = req;
 
   if (username === target.username) {
-    return next(new ErrorResponse("can't addfriend yourself", 400));
+    return next(new ErrorResponse("can't add friend yourself", 400));
   }
 
   const friendship = await Friend.findOne({
@@ -140,7 +140,7 @@ module.exports.decide = asyncHandler(async (req, res, next) => {
   });
 });
 
-module.exports.unsend = asyncHandler(async (req, res, next) => {
+module.exports.unsent = asyncHandler(async (req, res, next) => {
   const { username } = req.user;
   const { target } = req;
 
@@ -171,6 +171,6 @@ module.exports.unsend = asyncHandler(async (req, res, next) => {
 
   res.status(200).json({
     status: 'success',
-    data: 'unsend success',
+    data: 'unsent',
   });
 });

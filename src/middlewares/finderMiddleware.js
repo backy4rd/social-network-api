@@ -39,7 +39,7 @@ module.exports.findTarget = asyncHandler(async (req, res, next) => {
 
   const target = await User.findOne({ where: { username: targetName } });
   if (!target) {
-    return next(new ErrorResponse("target doen't exist", 404));
+    return next(new ErrorResponse("target doesn't exist", 404));
   }
 
   req.target = target;

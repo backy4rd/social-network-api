@@ -36,12 +36,12 @@ router.get(
   friendController.decide,
 );
 
-// unsend friend request
+// unsent friend request
 router.get(
-  '/unsend',
+  '/unsent',
   validateMiddleware.authorize,
   finderMiddleware.findTarget,
-  friendController.unsend,
+  friendController.unsent,
 );
 
 module.exports = router;

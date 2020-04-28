@@ -4,7 +4,7 @@ const sharp = require('sharp');
 const { User, Post, PostPhoto, Like, Notification } = require('../models');
 const asyncHandler = require('../utils/asyncHandler');
 const ErrorResponse = require('../utils/errorResponse');
-const responseHander = require('../utils/responseHander');
+const responseHandler = require('../utils/responseHandler');
 const requestHandler = require('../utils/requestHandler');
 
 module.exports.createPost = asyncHandler(async (req, res, next) => {
@@ -55,7 +55,7 @@ module.exports.createPost = asyncHandler(async (req, res, next) => {
 
   res.status(201).json({
     status: 'success',
-    data: responseHander.processPost(newPost),
+    data: responseHandler.processPost(newPost),
   });
 });
 
@@ -129,7 +129,7 @@ module.exports.updatePost = asyncHandler(async (req, res, next) => {
 
   res.status(200).json({
     status: 'success',
-    data: responseHander.processPost(post),
+    data: responseHandler.processPost(post),
   });
 });
 
@@ -164,7 +164,7 @@ module.exports.like = asyncHandler(async (req, res, next) => {
     await post.increment({ like: -1 }, { where: { id: post.id } });
     return res.status(200).json({
       status: 'success',
-      data: 'unliked',
+      data: 'unlike',
     });
   }
 
@@ -180,7 +180,7 @@ module.exports.like = asyncHandler(async (req, res, next) => {
   await post.increment({ like: 1 }, { where: { id: post.id } });
   res.status(200).json({
     status: 'success',
-    data: 'liked',
+    data: 'like',
   });
 });
 
@@ -206,6 +206,6 @@ module.exports.getPost = asyncHandler(async (req, res, next) => {
 
   res.status(200).json({
     status: 'success',
-    data: responseHander.processPost(post),
+    data: responseHandler.processPost(post),
   });
 });

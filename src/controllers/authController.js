@@ -4,8 +4,8 @@ const jwt = require('jsonwebtoken');
 const { User } = require('../models');
 const asyncHandler = require('../utils/asyncHandler');
 const ErrorResponse = require('../utils/errorResponse');
-const transporter = require('../utils/mailTranspoter');
-const responseHander = require('../utils/responseHander');
+const transporter = require('../utils/mailTransporter');
+const responseHandler = require('../utils/responseHandler');
 
 module.exports.register = asyncHandler(async (req, res) => {
   const { username, password, fullName, female, email } = req.body;
@@ -27,7 +27,7 @@ module.exports.register = asyncHandler(async (req, res) => {
 
   res.status(201).json({
     status: 'success',
-    data: responseHander.processUser(newUser),
+    data: responseHandler.processUser(newUser),
   });
 });
 
@@ -53,7 +53,7 @@ module.exports.login = asyncHandler(async (req, res, next) => {
 
   res.status(200).json({
     status: 'success',
-    data: responseHander.processUser(user),
+    data: responseHandler.processUser(user),
   });
 });
 
@@ -138,7 +138,7 @@ module.exports.sendForgotMail = asyncHandler(async (req, res, next) => {
 
   const user = await User.findOne({ where: { username } });
   if (!user) {
-    return next(new ErrorResponse("username doen't exist", 404));
+    return next(new ErrorResponse("username doesn't exist", 404));
   }
 
   if (!user.verified) {
@@ -173,7 +173,7 @@ module.exports.resetPassword = asyncHandler(async (req, res, next) => {
 
   const user = await User.findOne({ where: { username } });
   if (!user) {
-    return next(new ErrorResponse("username doen't exist", 404));
+    return next(new ErrorResponse("username doesn't exist", 404));
   }
 
   if (forgotCode !== req.session.get(username)) {
