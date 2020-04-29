@@ -22,6 +22,9 @@ router.post('/login', authController.login);
 // login with google
 router.get('/oauth/google', authController.OAuthGoogle);
 
+// login with facebook
+router.get('/oauth/facebook', authController.OAuthFacebook);
+
 // verify account
 router.get('/verify', authController.verifyVerificationMail);
 

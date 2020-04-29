@@ -200,9 +200,9 @@ module.exports.OAuthGoogle = asyncHandler(async (req, res, next) => {
   const tokenUrl = 'https://oauth2.googleapis.com/token';
   const { data: metaToken } = await axios.post(tokenUrl, {
     code: req.query.code,
-    client_id: process.env.CLIENT_ID,
-    client_secret: process.env.CLIENT_SECRET,
-    redirect_uri: process.env.REDIRECT_URI,
+    client_id: process.env.CLIENT_ID_GOOGLE,
+    client_secret: process.env.CLIENT_SECRET_GOOGLE,
+    redirect_uri: process.env.REDIRECT_URI_GOOGLE,
     grant_type: 'authorization_code',
   });
 
@@ -244,4 +244,21 @@ module.exports.OAuthGoogle = asyncHandler(async (req, res, next) => {
     status: 'success',
     data: responseHandler.processUser(user),
   });
+});
+
+module.exports.OAuthFacebook = asyncHandler(async (req, res, next) => {
+  const tokenUrl = url.format({
+    protocol: 'http',
+    host: 'graph.facebook.com',
+    pathname: '/v6.0/oauth/access_token',
+    query: {
+      client_id: process.env.CLIENT_ID_FACEBOOK,
+      client_secret: process.env.CLIENT_SECRET_FACEBOOK,
+      redirect_uri: process.env.REDIRECT_URI_FACEBOOK,
+      code: req.query.code,
+    }
+  });
+  const { data: metaToken } = await axios.get(tokenUrl);
+
+  res.send(metaToken);
 });
