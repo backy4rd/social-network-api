@@ -12,7 +12,7 @@ module.exports.getNotification = asyncHandler(async (req, res, next) => {
     offset: from,
     limit: limit,
     order: ['createdAt'],
-    include: { model: User, attributes: ['fullName', 'avatar'] },
+    include: { model: User, attributes: ['firstName', 'lastName', 'avatar'] },
   });
 
   res.status(200).json({

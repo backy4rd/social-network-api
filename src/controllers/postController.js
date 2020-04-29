@@ -192,7 +192,7 @@ module.exports.getLikes = asyncHandler(async (req, res, next) => {
     offset: from,
     limit: limit,
     order: ['createdAt'],
-    include: { model: User, attributes: ['fullName'] },
+    include: { model: User, attributes: ['firstName', 'lastName'] },
   });
 
   res.status(200).json({

@@ -8,13 +8,14 @@ const transporter = require('../utils/mailTransporter');
 const responseHandler = require('../utils/responseHandler');
 
 module.exports.register = asyncHandler(async (req, res) => {
-  const { username, password, fullName, female, email } = req.body;
+  const { username, password, firstName, lastName, female, email } = req.body;
 
   const newUser = await User.build({
     username: username,
     password: password,
     female: female === '1',
-    fullName: fullName,
+    firstName: firstName,
+    lastName: lastName,
     email: email,
   });
   await newUser.validate();

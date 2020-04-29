@@ -44,7 +44,7 @@ module.exports.getPostComments = asyncHandler(async (req, res, next) => {
     offset: from,
     limit: limit,
     order: ['createdAt'],
-    include: { model: User, attributes: ['fullName', 'avatar'] },
+    include: { model: User, attributes: ['firstName', 'lastName', 'avatar'] },
   });
 
   res.status(200).json({
@@ -61,7 +61,7 @@ module.exports.getReplyComments = asyncHandler(async (req, res, next) => {
     offset: from,
     limit: limit,
     order: ['createdAt'],
-    include: { model: User, attributes: ['fullName', 'avatar'] },
+    include: { model: User, attributes: ['firstName', 'lastName', 'avatar'] },
   });
 
   res.status(200).json({
@@ -174,7 +174,7 @@ module.exports.getCommentLikes = asyncHandler(async (req, res, next) => {
     offset: parseInt(from, 10),
     limit: parseInt(limit, 10),
     order: ['createdAt'],
-    include: { model: User, attributes: ['fullName'] },
+    include: { model: User, attributes: ['lastName', 'lastName'] },
   });
 
   res.status(200).json({

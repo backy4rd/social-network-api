@@ -21,17 +21,24 @@ module.exports = (sequelize, DataTypes) => {
           len: { args: [6, 32], msg: 'password length must around 6-32' },
         },
       },
-      fullName: {
+      firstName: {
         type: DataTypes.STRING(64) + ' CHARSET utf8 COLLATE utf8_unicode_ci',
         allowNull: false,
         validate: {
-          is: { args: /^[A-z][A-z._\s]+[A-z]$/, msg: 'invalid name' },
+          is: { args: /^[A-z][A-z\s]+[A-z]$/, msg: 'invalid name' },
+          not: { args: /\s{2,}/, msg: 'invalid name' },
+        },
+      },
+      lastName: {
+        type: DataTypes.STRING(64) + ' CHARSET utf8 COLLATE utf8_unicode_ci',
+        allowNull: false,
+        validate: {
+          is: { args: /^[A-z][A-z\s]+[A-z]$/, msg: 'invalid name' },
           not: { args: /\s{2,}/, msg: 'invalid name' },
         },
       },
       female: {
         type: DataTypes.BOOLEAN,
-        allowNull: false,
       },
       email: {
         type: DataTypes.STRING(64),
@@ -68,7 +75,8 @@ module.exports = (sequelize, DataTypes) => {
     const payload = {
       username: this.username,
       email: this.email,
-      fullName: this.fullName,
+      firstName: this.firstName,
+      lastName: this.lastName,
       verified: this.verified,
     };
     const secret = process.env.SECRET;

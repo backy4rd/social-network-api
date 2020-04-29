@@ -11,7 +11,11 @@ module.exports = {
           type: Sequelize.STRING(80),
           allowNull: false,
         },
-        fullName: {
+        firstName: {
+          type: Sequelize.STRING(64) + ' CHARSET utf8 COLLATE utf8_unicode_ci',
+          allowNull: false,
+        },
+        lastName: {
           type: Sequelize.STRING(64) + ' CHARSET utf8 COLLATE utf8_unicode_ci',
           allowNull: false,
         },
@@ -21,7 +25,6 @@ module.exports = {
         },
         female: {
           type: Sequelize.BOOLEAN,
-          allowNull: false,
         },
         avatar: {
           type: Sequelize.STRING(128),

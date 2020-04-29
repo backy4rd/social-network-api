@@ -30,17 +30,21 @@ module.exports.getUser = asyncHandler(async (req, res, next) => {
 
 module.exports.updateUser = asyncHandler(async (req, res, next) => {
   const { username } = req.user;
-  const { fullName } = req.body;
+  const { firstName, lastName } = req.body;
   const { file } = req;
 
-  if (!(fullName || file)) {
+  if (!(firstName || lastName || file)) {
     return next(new ErrorResponse('missing parameters', 400));
   }
 
   const user = await User.findByPk(username);
 
-  if (fullName) {
-    user.fullName = fullName;
+  if (firstName) {
+    user.firstName = firstName;
+  }
+
+  if (lastName) {
+    user.lastName = lastName;
   }
 
   if (file) {
@@ -126,7 +130,7 @@ module.exports.getPost = asyncHandler(async (req, res, next) => {
     order: ['createdAt'],
     include: [
       { model: PostPhoto, as: 'photos' },
-      { model: User, attributes: ['fullName'] },
+      { model: User, attributes: ['firstName', 'lastName'] },
     ],
   });
 
@@ -166,7 +170,7 @@ module.exports.getFriends = asyncHandler(async (req, res, next) => {
     order: ['createdAt'],
     include: {
       model: User,
-      attributes: ['fullName', 'avatar'],
+      attributes: ['firstName', 'lastName', 'avatar'],
     },
   });
 
@@ -188,7 +192,7 @@ module.exports.getFriendsRequest = asyncHandler(async (req, res, next) => {
     order: ['createdAt'],
     include: {
       model: User,
-      attributes: ['fullName', 'avatar'],
+      attributes: ['firstName', 'lastName', 'avatar'],
     },
   });
 
