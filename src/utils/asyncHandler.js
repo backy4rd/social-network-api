@@ -1,9 +1,5 @@
 module.exports = middleware => {
-  return async (req, res, next) => {
-    try {
-      await middleware(req, res, next);
-    } catch (err) {
-      next(err);
-    }
+  return (req, res, next) => {
+    middleware(req, res, next).catch(err => next(err));
   };
 };
