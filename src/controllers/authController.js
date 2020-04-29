@@ -1,6 +1,6 @@
 const url = require('url');
 const jwt = require('jsonwebtoken');
-const axios = require('axios');
+const request = require('request-promise');
 
 const { User } = require('../models');
 const asyncHandler = require('../utils/asyncHandler');
@@ -197,24 +197,25 @@ module.exports.resetPassword = asyncHandler(async (req, res, next) => {
 });
 
 module.exports.OAuthGoogle = asyncHandler(async (req, res, next) => {
-  const tokenUrl = 'https://oauth2.googleapis.com/token';
-  const { data: metaToken } = await axios.post(tokenUrl, {
-    code: req.query.code,
-    client_id: process.env.CLIENT_ID_GOOGLE,
-    client_secret: process.env.CLIENT_SECRET_GOOGLE,
-    redirect_uri: process.env.REDIRECT_URI_GOOGLE,
-    grant_type: 'authorization_code',
+  // const tokenUrl = 'https://oauth2.googleapis.com/token';
+  const metaToken = await request({
+    method: 'POST',
+    uri: 'https://oauth2.googleapis.com/token',
+    body: {
+      code: req.query.code,
+      client_id: process.env.CLIENT_ID_GOOGLE,
+      client_secret: process.env.CLIENT_SECRET_GOOGLE,
+      redirect_uri: process.env.REDIRECT_URI_GOOGLE,
+      grant_type: 'authorization_code',
+    },
+    json: true,
   });
 
-  const profileUrl = url.format({
-    protocol: 'https',
-    host: 'oauth2.googleapis.com',
-    pathname: '/tokeninfo',
-    query: {
-      id_token: metaToken.id_token,
-    },
+  const userInfo = await request({
+    uri: 'https://oauth2.googleapis.com/tokeninfo',
+    qs: { id_token: metaToken.id_token },
+    json: true,
   });
-  const { data: userInfo } = await axios.get(profileUrl);
 
   // user exist ? login : register
   let user = await User.findOne({ where: { username: userInfo.sub } });
@@ -247,18 +248,16 @@ module.exports.OAuthGoogle = asyncHandler(async (req, res, next) => {
 });
 
 module.exports.OAuthFacebook = asyncHandler(async (req, res, next) => {
-  const tokenUrl = url.format({
-    protocol: 'http',
-    host: 'graph.facebook.com',
-    pathname: '/v6.0/oauth/access_token',
-    query: {
+  const response = await request({
+    uri: 'https://graph.facebook.com/v6.0/oauth/access_token',
+    qs: {
       client_id: process.env.CLIENT_ID_FACEBOOK,
       client_secret: process.env.CLIENT_SECRET_FACEBOOK,
       redirect_uri: process.env.REDIRECT_URI_FACEBOOK,
       code: req.query.code,
-    }
+    },
+    json: true,
   });
-  const { data: metaToken } = await axios.get(tokenUrl);
 
-  res.send(metaToken);
+  res.send(response);
 });
