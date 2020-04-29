@@ -5,7 +5,7 @@ const nodeEnv = process.env.NODE_ENV;
 const logStream = fs.createWriteStream('./src/server.log', { flags: 'a' });
 
 module.exports = (err, req, res, next) => {
-  if (/Validation error/.test(err)) {
+  if (/Sequelize/.test(err) && /Validation/.test(err)) {
     return res.status(400).json({
       status: 'fail',
       data: err.message.split(',\n'),
