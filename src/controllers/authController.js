@@ -1,5 +1,6 @@
 const url = require('url');
 const jwt = require('jsonwebtoken');
+const axios = require('axios');
 
 const { User } = require('../models');
 const asyncHandler = require('../utils/asyncHandler');
@@ -17,6 +18,7 @@ module.exports.register = asyncHandler(async (req, res) => {
     firstName: firstName,
     lastName: lastName,
     email: email,
+    verified: false,
   });
   await newUser.validate();
   await newUser.encryptPassword();
@@ -191,5 +193,55 @@ module.exports.resetPassword = asyncHandler(async (req, res, next) => {
   res.status(200).json({
     status: 'success',
     data: 'reset password success',
+  });
+});
+
+module.exports.OAuthGoogle = asyncHandler(async (req, res, next) => {
+  const tokenUrl = 'https://oauth2.googleapis.com/token';
+  const { data: metaToken } = await axios.post(tokenUrl, {
+    code: req.query.code,
+    client_id: process.env.CLIENT_ID,
+    client_secret: process.env.CLIENT_SECRET,
+    redirect_uri: process.env.REDIRECT_URI,
+    grant_type: 'authorization_code',
+  });
+
+  const profileUrl = url.format({
+    protocol: 'https',
+    host: 'oauth2.googleapis.com',
+    pathname: '/tokeninfo',
+    query: {
+      id_token: metaToken.id_token,
+    },
+  });
+  const { data: userInfo } = await axios.get(profileUrl);
+
+  // user exist ? login : register
+  let user = await User.findOne({ where: { username: userInfo.sub } });
+  let statusCode = 200;
+
+  // register
+  if (!user) {
+    user = await User.build({
+      username: userInfo.sub,
+      password: Date.now().toString(),
+      firstName: userInfo.given_name,
+      lastName: userInfo.family_name,
+      email: userInfo.email,
+      female: null,
+      verified: true,
+    });
+    await user.validate();
+    await user.encryptPassword();
+    await user.save({ validate: false });
+    statusCode = 201;
+  }
+
+  const token = await user.generateAccessToken();
+  res.cookie('token', token, { httpOnly: true });
+
+  res.status(statusCode).json({
+    status: 'success',
+    data: responseHandler.processUser(user),
   });
 });
