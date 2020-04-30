@@ -197,7 +197,6 @@ module.exports.resetPassword = asyncHandler(async (req, res, next) => {
 });
 
 module.exports.OAuthGoogle = asyncHandler(async (req, res, next) => {
-  // const tokenUrl = 'https://oauth2.googleapis.com/token';
   const metaToken = await request({
     method: 'POST',
     uri: 'https://oauth2.googleapis.com/token',
@@ -248,7 +247,7 @@ module.exports.OAuthGoogle = asyncHandler(async (req, res, next) => {
 });
 
 module.exports.OAuthFacebook = asyncHandler(async (req, res, next) => {
-  const response = await request({
+  const metaToken = await request({
     uri: 'https://graph.facebook.com/v6.0/oauth/access_token',
     qs: {
       client_id: process.env.CLIENT_ID_FACEBOOK,
@@ -259,5 +258,43 @@ module.exports.OAuthFacebook = asyncHandler(async (req, res, next) => {
     json: true,
   });
 
-  res.send(response);
+  const userInfo = await request({
+    uri: 'https://graph.facebook.com/v6.0/me',
+    qs: {
+      fields: 'first_name,last_name,middle_name,picture,email',
+      access_token: metaToken.access_token,
+    },
+    json: true,
+  });
+
+  if (!userInfo.email) {
+    return next(new ErrorResponse('facebook account must have email', 400));
+  }
+
+  let user = await User.findOne({ where: { username: userInfo.id } });
+  let statusCode = 200;
+
+  if (!user) {
+    user = await User.build({
+      username: userInfo.id,
+      password: Date.now().toString(),
+      firstName: `${userInfo.first_name} ${userInfo.middle_name || ''}`.trim(),
+      lastName: userInfo.last_name,
+      email: userInfo.email,
+      female: null,
+      verified: true,
+    });
+    await user.validate();
+    await user.encryptPassword();
+    await user.save({ validate: false });
+    statusCode = 201;
+  }
+
+  const token = await user.generateAccessToken();
+  res.cookie('token', token, { httpOnly: true });
+
+  res.status(statusCode).json({
+    status: 'success',
+    data: responseHandler.processUser(user),
+  });
 });
