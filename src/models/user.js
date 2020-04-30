@@ -1,6 +1,9 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
+const vietnamese = `[A-zÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠàáâãèéêìíòóôõùúăđĩũơƯĂẠẢẤẦẨẪẬẮẰẲẴẶẸẺẼỀỀỂ ưăạảấầẩẫậắằẳẵặẹẻẽềềểỄỆỈỊỌỎỐỒỔỖỘỚỜỞỠỢỤỦỨỪễệỉịọỏốồổỗộớờởỡợụủứừỬỮỰỲỴÝỶỸửữựỳỵỷỹ]`;
+const nameRegex = new RegExp(`^${vietnamese}(${vietnamese}|\\s)+${vietnamese}`);
+
 module.exports = (sequelize, DataTypes) => {
   const User = sequelize.define(
     'User',
@@ -25,16 +28,16 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING(64) + ' CHARSET utf8 COLLATE utf8_unicode_ci',
         allowNull: false,
         validate: {
-          is: { args: /^[A-z][A-z\s]+[A-z]$/, msg: 'invalid name' },
-          not: { args: /\s{2,}/, msg: 'invalid name' },
+          is: { args: nameRegex, msg: 'invalid firstName' },
+          not: { args: /\s{2,}/, msg: 'invalid firstName' },
         },
       },
       lastName: {
         type: DataTypes.STRING(64) + ' CHARSET utf8 COLLATE utf8_unicode_ci',
         allowNull: false,
         validate: {
-          is: { args: /^[A-z][A-z\s]+[A-z]$/, msg: 'invalid name' },
-          not: { args: /\s{2,}/, msg: 'invalid name' },
+          is: { args: nameRegex, msg: 'invalid lastName' },
+          not: { args: /\s{2,}/, msg: 'invalid lastName' },
         },
       },
       female: {
