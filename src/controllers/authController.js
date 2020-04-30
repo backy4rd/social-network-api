@@ -1,6 +1,6 @@
 const url = require('url');
 const jwt = require('jsonwebtoken');
-const axios = require('axios');
+const request = require('request-promise');
 
 const { User } = require('../models');
 const asyncHandler = require('../utils/asyncHandler');
@@ -197,37 +197,90 @@ module.exports.resetPassword = asyncHandler(async (req, res, next) => {
 });
 
 module.exports.OAuthGoogle = asyncHandler(async (req, res, next) => {
-  const tokenUrl = 'https://oauth2.googleapis.com/token';
-  const { data: metaToken } = await axios.post(tokenUrl, {
-    code: req.query.code,
-    client_id: process.env.CLIENT_ID,
-    client_secret: process.env.CLIENT_SECRET,
-    redirect_uri: process.env.REDIRECT_URI,
-    grant_type: 'authorization_code',
+  const { id_token: idToken } = await request({
+    method: 'POST',
+    uri: 'https://oauth2.googleapis.com/token',
+    body: {
+      code: req.query.code,
+      client_id: process.env.CLIENT_ID_GOOGLE,
+      client_secret: process.env.CLIENT_SECRET_GOOGLE,
+      redirect_uri: process.env.REDIRECT_URI_GOOGLE,
+      grant_type: 'authorization_code',
+    },
+    json: true,
   });
 
-  const profileUrl = url.format({
-    protocol: 'https',
-    host: 'oauth2.googleapis.com',
-    pathname: '/tokeninfo',
-    query: {
-      id_token: metaToken.id_token,
-    },
+  const profile = await request({
+    uri: 'https://oauth2.googleapis.com/tokeninfo',
+    qs: { id_token: idToken },
+    json: true,
   });
-  const { data: userInfo } = await axios.get(profileUrl);
 
   // user exist ? login : register
-  let user = await User.findOne({ where: { username: userInfo.sub } });
+  let user = await User.findOne({ where: { username: profile.sub } });
   let statusCode = 200;
 
   // register
   if (!user) {
     user = await User.build({
-      username: userInfo.sub,
-      password: Date.now().toString(),
-      firstName: userInfo.given_name,
-      lastName: userInfo.family_name,
-      email: userInfo.email,
+      username: profile.sub,
+      password: Date.now().toString() + Math.random().toString(),
+      firstName: profile.given_name,
+      lastName: profile.family_name,
+      email: profile.email,
+      female: null,
+      verified: true,
+    });
+    await user.validate();
+    await user.encryptPassword();
+    await user.save({ validate: false });
+    statusCode = 201;
+  }
+
+  const token = await user.generateAccessToken();
+  res.cookie('token', token, { httpOnly: true });
+
+  res.status(statusCode).json({
+    status: 'success',
+    data: responseHandler.processUser(user),
+  });
+});
+
+module.exports.OAuthFacebook = asyncHandler(async (req, res, next) => {
+  const { access_token: accessToken } = await request({
+    uri: 'https://graph.facebook.com/v6.0/oauth/access_token',
+    qs: {
+      client_id: process.env.CLIENT_ID_FACEBOOK,
+      client_secret: process.env.CLIENT_SECRET_FACEBOOK,
+      redirect_uri: process.env.REDIRECT_URI_FACEBOOK,
+      code: req.query.code,
+    },
+    json: true,
+  });
+
+  const profile = await request({
+    uri: 'https://graph.facebook.com/v6.0/me',
+    qs: {
+      fields: 'first_name,last_name,middle_name,email',
+      access_token: accessToken,
+    },
+    json: true,
+  });
+
+  if (!profile.email) {
+    return next(new ErrorResponse('facebook account must have email', 400));
+  }
+
+  let user = await User.findOne({ where: { username: profile.id } });
+  let statusCode = 200;
+
+  if (!user) {
+    user = await User.build({
+      username: profile.id,
+      password: Date.now().toString() + Math.random().toString(),
+      firstName: `${profile.first_name} ${profile.middle_name || ''}`.trim(),
+      lastName: profile.last_name,
+      email: profile.email,
       female: null,
       verified: true,
     });
