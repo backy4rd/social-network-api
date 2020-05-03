@@ -8,13 +8,19 @@ const ErrorResponse = require('../utils/errorResponse');
 const transporter = require('../utils/mailTransporter');
 const responseHandler = require('../utils/responseHandler');
 
-module.exports.register = asyncHandler(async (req, res) => {
+module.exports.register = asyncHandler(async (req, res, next) => {
   const { username, password, firstName, lastName, female, email } = req.body;
+
+  if (female) {
+    if (female !== '0' && female !== '1') {
+      return next(new ErrorResponse("female only accept '0' and '1'"));
+    }
+  }
 
   const newUser = await User.build({
     username: username,
     password: password,
-    female: female === '1',
+    female: female ? female === '1' : null,
     firstName: firstName,
     lastName: lastName,
     email: email,
@@ -27,7 +33,6 @@ module.exports.register = asyncHandler(async (req, res) => {
   const token = await newUser.generateAccessToken();
 
   res.cookie('token', token, { httpOnly: true });
-
   res.status(201).json({
     status: 'success',
     data: responseHandler.processUser(newUser),
@@ -53,7 +58,6 @@ module.exports.login = asyncHandler(async (req, res, next) => {
   const token = await user.generateAccessToken();
 
   res.cookie('token', token, { httpOnly: true });
-
   res.status(200).json({
     status: 'success',
     data: responseHandler.processUser(user),
@@ -238,8 +242,8 @@ module.exports.OAuthGoogle = asyncHandler(async (req, res, next) => {
   }
 
   const token = await user.generateAccessToken();
-  res.cookie('token', token, { httpOnly: true });
 
+  res.cookie('token', token, { httpOnly: true });
   res.status(statusCode).json({
     status: 'success',
     data: responseHandler.processUser(user),
@@ -291,8 +295,8 @@ module.exports.OAuthFacebook = asyncHandler(async (req, res, next) => {
   }
 
   const token = await user.generateAccessToken();
-  res.cookie('token', token, { httpOnly: true });
 
+  res.cookie('token', token, { httpOnly: true });
   res.status(statusCode).json({
     status: 'success',
     data: responseHandler.processUser(user),
