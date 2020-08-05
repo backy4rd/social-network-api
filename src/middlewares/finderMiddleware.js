@@ -1,3 +1,5 @@
+const { expect } = require('chai');
+
 const { User, Comment, Post, PostPhoto } = require('../models');
 const asyncHandler = require('../utils/asyncHandler');
 const ErrorResponse = require('../utils/errorResponse');
@@ -9,9 +11,7 @@ module.exports.findPost = asyncHandler(async (req, res, next) => {
     include: { model: PostPhoto, as: 'photos' },
   });
 
-  if (!post) {
-    return next(new ErrorResponse('post not found', 404));
-  }
+  expect(post, '404:post not found').to.exist;
 
   req.post = post;
   next();
@@ -22,9 +22,7 @@ module.exports.findComment = asyncHandler(async (req, res, next) => {
 
   const comment = await Comment.findByPk(commentId);
 
-  if (!comment) {
-    return next(new ErrorResponse('comment not found', 404));
-  }
+  expect(comment, '404:comment not found').to.exist;
 
   req.comment = comment;
   next();
@@ -33,14 +31,10 @@ module.exports.findComment = asyncHandler(async (req, res, next) => {
 module.exports.findTarget = asyncHandler(async (req, res, next) => {
   const { target: targetName } = req.query;
 
-  if (!targetName) {
-    return next(new ErrorResponse('missing parameters', 400));
-  }
+  expect(targetName, '404:missing parameters').to.exist;
 
   const target = await User.findOne({ where: { username: targetName } });
-  if (!target) {
-    return next(new ErrorResponse("target doesn't exist", 404));
-  }
+  expect(target, `404:target doesn't exist`).to.exist;
 
   req.target = target;
   next();

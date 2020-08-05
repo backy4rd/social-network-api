@@ -1,3 +1,4 @@
+const { expect } = require('chai');
 const {
   Friend,
   Sequelize: { Op },
@@ -9,9 +10,9 @@ module.exports.addFriend = asyncHandler(async (req, res, next) => {
   const { username } = req.user;
   const { target } = req;
 
-  if (username === target.username) {
-    return next(new ErrorResponse("can't add friend yourself", 400));
-  }
+  expect(username, "400:can't add friend yourself").to.not.equal(
+    target.username,
+  );
 
   const friendship = await Friend.findOne({
     where: {
@@ -61,12 +62,8 @@ module.exports.unfriend = asyncHandler(async (req, res, next) => {
     },
   });
 
-  if (!friendship) {
-    return next(new ErrorResponse('not in relationship', 404));
-  }
-  if (friendship.status !== 'friend') {
-    return next(new ErrorResponse('still not be friend', 400));
-  }
+  expect(friendship, '404:not in relationship').to.exist;
+  expect(friendship.status, '400:still not be friend').to.equal('friend');
 
   await Friend.destroy({
     where: {
@@ -87,15 +84,11 @@ module.exports.unfriend = asyncHandler(async (req, res, next) => {
 
 module.exports.decide = asyncHandler(async (req, res, next) => {
   const { username } = req.user;
-  const { action } = req.query;
+  const action = req.query.action.toLowerCase();
   const { target } = req;
 
-  if (!action) {
-    return next(new ErrorResponse('missing parameters', 400));
-  }
-  if (!/^(accept|decline)$/.test(action.toLowerCase())) {
-    return next(new ErrorResponse('invalid action', 400));
-  }
+  expect(action, '404:missing parameters').to.exist;
+  expect(action, '400:invalid action').to.be.oneOf(['accept', 'decline']);
 
   const friendship = await Friend.findOne({
     where: {
@@ -104,24 +97,18 @@ module.exports.decide = asyncHandler(async (req, res, next) => {
     },
   });
 
-  if (!friendship) {
-    return next(new ErrorResponse('not in relationship', 404));
-  }
-  if (friendship.status === 'friend') {
-    return next(new ErrorResponse('already been friend', 400));
-  }
-  if (friendship.status !== 'pending') {
-    return next(new ErrorResponse("can't " + action, 400));
-  }
+  expect(friendship, '404:not in relationship').to.exist;
+  expect(friendship.status, '400:already been friend').to.not.equal('friend');
+  expect(friendship.status, `400:can't ${action}`).to.equal('pending');
 
-  if (action.toLowerCase() === 'accept') {
+  if (action === 'accept') {
     await Friend.update({ status: 'friend' }, { where: { userA: username } });
     await Friend.update(
       { status: 'friend' },
       { where: { userA: target.username } },
     );
   }
-  if (action.toLowerCase() === 'decline') {
+  if (action === 'decline') {
     await Friend.destroy({
       where: {
         [Op.and]: [{ userA: username }, { userB: target.username }],
@@ -151,12 +138,8 @@ module.exports.unsent = asyncHandler(async (req, res, next) => {
     },
   });
 
-  if (!friendship) {
-    return next(new ErrorResponse('not in relationship', 404));
-  }
-  if (friendship.status !== 'sent') {
-    return next(new ErrorResponse("can't find request", 404));
-  }
+  expect(friendship, '404:not in relationship').to.exist;
+  expect(friendship.status, `404:can't find request`).to.equal('sent');
 
   await Friend.destroy({
     where: {

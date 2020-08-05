@@ -1,3 +1,4 @@
+const { expect } = require('chai');
 const { User, Comment, CommentLike, Notification } = require('../models');
 const asyncHandler = require('../utils/asyncHandler');
 const ErrorResponse = require('../utils/errorResponse');
@@ -9,9 +10,7 @@ module.exports.createComment = asyncHandler(async (req, res, next) => {
   const { username } = req.user;
   const { content } = req.body;
 
-  if (!content) {
-    return next(new ErrorResponse('missing parameters', 400));
-  }
+  expect(content, '400:missing parameters').to.exist;
 
   const newComment = await Comment.create({
     commenter: username,
@@ -74,9 +73,7 @@ module.exports.updateComment = asyncHandler(async (req, res, next) => {
   const { comment } = req;
   const { content } = req.body;
 
-  if (!content) {
-    return next(new ErrorResponse('missing parameters', 400));
-  }
+  expect(content, '400:missing parameters').to.exist;
 
   comment.content = content;
   await comment.save();
@@ -103,13 +100,8 @@ module.exports.replyComment = asyncHandler(async (req, res, next) => {
   const { username } = req.user;
   const { comment } = req;
 
-  if (!content) {
-    return next(new ErrorResponse('missing parameters', 400));
-  }
-
-  if (comment.replyOf !== null) {
-    return next(new ErrorResponse('unaccepted nesting reply', 400));
-  }
+  expect(content, '400:missing parameters').to.exist;
+  expect(content, '400:unaccepted nesting reply').to.not.be.null;
 
   const replyComment = await Comment.create({
     commenter: username,

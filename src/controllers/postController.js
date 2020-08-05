@@ -1,5 +1,6 @@
 const fs = require('fs');
 const sharp = require('sharp');
+const { expect } = require('chai');
 
 const { User, Post, PostPhoto, Like, Notification } = require('../models');
 const asyncHandler = require('../utils/asyncHandler');

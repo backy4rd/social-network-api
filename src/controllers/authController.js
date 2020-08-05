@@ -1,6 +1,7 @@
 const url = require('url');
 const jwt = require('jsonwebtoken');
 const request = require('request-promise');
+const { expect } = require('chai');
 
 const { User } = require('../models');
 const asyncHandler = require('../utils/asyncHandler');
@@ -11,11 +12,8 @@ const responseHandler = require('../utils/responseHandler');
 module.exports.register = asyncHandler(async (req, res, next) => {
   const { username, password, firstName, lastName, female, email } = req.body;
 
-  if (female) {
-    if (female !== '0' && female !== '1') {
-      return next(new ErrorResponse("female only accept '0' and '1'"));
-    }
-  }
+  expect(female, '400:require female field').to.exist;
+  expect(female, '400:invalid parameters').to.be.oneOf(['0', '1']);
 
   const newUser = await User.build({
     username: username,
@@ -41,19 +39,14 @@ module.exports.register = asyncHandler(async (req, res, next) => {
 
 module.exports.login = asyncHandler(async (req, res, next) => {
   const { username, password } = req.body;
-  if (!username || !password) {
-    return next(new ErrorResponse('missing parameters', 400));
-  }
+  expect(username, '400:require username field').to.exist;
+  expect(password, '400:require password field').to.exist;
 
   const user = await User.findOne({ where: { username } });
-  if (!user) {
-    return next(new ErrorResponse("username doesn't exist", 404));
-  }
+  expect(user, "404:username doesn't exist").to.exist;
 
   const match = await user.comparePassword(password);
-  if (!match) {
-    return next(new ErrorResponse('password not match', 400));
-  }
+  expect(match, '400:password not match').to.be.true;
 
   const token = await user.generateAccessToken();
 
@@ -67,9 +60,7 @@ module.exports.login = asyncHandler(async (req, res, next) => {
 module.exports.sendVerificationMail = asyncHandler(async (req, res, next) => {
   const { username, email, verified } = req.user;
 
-  if (verified) {
-    return next(new ErrorResponse('already verified', 400));
-  }
+  expect(match, '400:already verified').to.be.false;
 
   const user = await User.findOne({ where: { username } });
   const verificationToken = await user.generateVerificationToken();
@@ -105,21 +96,15 @@ module.exports.verifyVerificationMail = asyncHandler(async (req, res, next) => {
   const { token } = req.query;
   const secret = process.env.SECRET;
 
-  if (!token) {
-    return next(new ErrorResponse('token not found', 404));
-  }
+  expect(token, '400:token not found').to.be.exist;
 
   jwt.verify(token, secret, async (err, decoded) => {
     if (err) return next(err);
-    if (!decoded.verify) {
-      return next(new ErrorResponse('invalid token', 400));
-    }
+    expect(decoded.verify, '400:invalid token').to.be.true;
 
     const user = await User.findOne({ where: { username: decoded.username } });
 
-    if (user.verified) {
-      return next(new ErrorResponse('already verified', 400));
-    }
+    expect(user.verified, '400:already verified').to.be.false;
 
     user.verified = true;
     await user.save();
@@ -139,18 +124,12 @@ module.exports.verifyVerificationMail = asyncHandler(async (req, res, next) => {
 
 module.exports.sendForgotMail = asyncHandler(async (req, res, next) => {
   const { username } = req.query;
-  if (!username) {
-    return next(new ErrorResponse('missing parameters', 400));
-  }
+  expect(username, '400:require username field').to.be.exist;
 
   const user = await User.findOne({ where: { username } });
-  if (!user) {
-    return next(new ErrorResponse("username doesn't exist", 404));
-  }
+  expect(user, "404:username doesn't exist").to.exist;
 
-  if (!user.verified) {
-    return next(new ErrorResponse("email hasn't been verified"), 400);
-  }
+  expect(user.verified, "400:email hasn't been verified").to.be.true;
 
   const code = Math.floor(Math.random() * 899999 + 100000).toString();
   const mailOptions = {
@@ -174,18 +153,16 @@ module.exports.sendForgotMail = asyncHandler(async (req, res, next) => {
 
 module.exports.resetPassword = asyncHandler(async (req, res, next) => {
   const { username, newPassword, forgotCode } = req.body;
-  if (!username || !newPassword || !forgotCode) {
-    return next(new ErrorResponse('missing parameters', 400));
-  }
+  expect(username, '400:require username field').to.be.exist;
+  expect(newPassword, '400:require newPassword field').to.be.exist;
+  expect(forgotCode, '400:require forgotCode field').to.be.exist;
 
   const user = await User.findOne({ where: { username } });
-  if (!user) {
-    return next(new ErrorResponse("username doesn't exist", 404));
-  }
+  expect(user, "404:username doesn't exist").to.exist;
 
-  if (forgotCode !== req.session.get(username)) {
-    return next(new ErrorResponse('invalid forgot code', 400));
-  }
+  expect(forgotCode, '400:invalid forgot code').to.equal(
+    req.session.get(username),
+  );
 
   user.password = newPassword;
   await user.validate({ field: ['password'] });
@@ -271,9 +248,7 @@ module.exports.OAuthFacebook = asyncHandler(async (req, res, next) => {
     json: true,
   });
 
-  if (!profile.email) {
-    return next(new ErrorResponse('facebook account must have email', 400));
-  }
+  expect(profile.email, '400:facebook account must have email').to.exist;
 
   let user = await User.findOne({ where: { username: profile.id } });
   let statusCode = 200;

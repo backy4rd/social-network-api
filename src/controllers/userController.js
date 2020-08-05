@@ -1,5 +1,6 @@
 const fs = require('fs');
 const sharp = require('sharp');
+const { expect } = require('chai');
 
 const {
   Friend,
@@ -18,9 +19,7 @@ module.exports.getUser = asyncHandler(async (req, res, next) => {
 
   const user = await User.findByPk(username);
 
-  if (!user) {
-    return next(new ErrorResponse("username doesn't exist", 404));
-  }
+  expect(user, `404:username doesn't exist`).to.exist;
 
   res.status(200).json({
     status: 'success',
@@ -33,9 +32,7 @@ module.exports.updateUser = asyncHandler(async (req, res, next) => {
   const { firstName, lastName } = req.body;
   const { file } = req;
 
-  if (!(firstName || lastName || file)) {
-    return next(new ErrorResponse('missing parameters', 400));
-  }
+  expect(firstName || lastName || file, '400:missing parameters').to.be.true;
 
   const user = await User.findByPk(username);
 
@@ -79,16 +76,12 @@ module.exports.updatePassword = asyncHandler(async (req, res, next) => {
   const { oldPassword, newPassword } = req.body;
   const { username } = req.user;
 
-  if (!oldPassword || !newPassword) {
-    return next(new ErrorResponse('missing parameters'), 400);
-  }
+  expect(oldPassword && newPassword, '400:missing parameters').to.be.true;
 
   const user = await User.findOne({ where: { username } });
 
   const match = await user.comparePassword(oldPassword);
-  if (!match) {
-    return next(new ErrorResponse('old password not match', 400));
-  }
+  expect(match, '400:old password not match').to.be.true;
 
   user.password = newPassword;
   await user.validate({ fields: ['password'] });
