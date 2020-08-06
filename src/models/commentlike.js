@@ -19,7 +19,7 @@ module.exports = (sequelize, DataTypes) => {
         type: 'TIMESTAMP',
       },
     },
-    { timestamps: false },
+    { timestamps: false, underscored: true },
   );
   CommentLike.associate = function (models) {
     CommentLike.belongsTo(models.User, {

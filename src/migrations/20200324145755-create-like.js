@@ -1,25 +1,25 @@
 module.exports = {
   up: (queryInterface, Sequelize) => {
-    return queryInterface.createTable('Likes', {
+    return queryInterface.createTable('likes', {
       liker: {
         type: Sequelize.STRING(32),
         primaryKey: true,
         references: {
-          model: 'Users',
+          model: 'users',
           key: 'username',
         },
         onDelete: 'CASCADE',
       },
-      postId: {
+      post_id: {
         type: Sequelize.INTEGER,
         primaryKey: true,
         references: {
-          model: 'Posts',
+          model: 'posts',
           key: 'id',
         },
         onDelete: 'CASCADE',
       },
-      createdAt: {
+      created_at: {
         type: 'TIMESTAMP',
         defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
         allowNull: false,
@@ -27,6 +27,6 @@ module.exports = {
     });
   },
   down: (queryInterface, Sequelize) => {
-    return queryInterface.dropTable('Likes');
+    return queryInterface.dropTable('likes');
   },
 };

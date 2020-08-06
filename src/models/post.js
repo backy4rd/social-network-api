@@ -33,7 +33,9 @@ module.exports = (sequelize, DataTypes) => {
         },
       },
     },
-    {},
+    {
+      underscored: true,
+    },
   );
 
   Post.associate = function (models) {

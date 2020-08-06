@@ -1,17 +1,17 @@
 module.exports = {
   up: (queryInterface, Sequelize) => {
-    return queryInterface.createTable('Comments', {
+    return queryInterface.createTable('comments', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER,
       },
-      postId: {
+      post_id: {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
-          model: 'Posts',
+          model: 'posts',
           key: 'id',
         },
         onDelete: 'CASCADE',
@@ -20,7 +20,7 @@ module.exports = {
         type: Sequelize.STRING(32),
         allowNull: false,
         references: {
-          model: 'Users',
+          model: 'users',
           key: 'username',
         },
         onDelete: 'CASCADE',
@@ -34,25 +34,25 @@ module.exports = {
         defaultValue: 0,
         allowNull: false,
       },
-      replyOf: {
+      reply_of: {
         type: Sequelize.INTEGER,
         references: {
-          model: 'Comments',
+          model: 'comments',
           key: 'id',
         },
         onDelete: 'CASCADE',
       },
-      createdAt: {
+      created_at: {
         allowNull: false,
         type: Sequelize.DATE,
       },
-      updatedAt: {
+      updated_at: {
         allowNull: false,
         type: Sequelize.DATE,
       },
     });
   },
   down: (queryInterface, Sequelize) => {
-    return queryInterface.dropTable('Comments');
+    return queryInterface.dropTable('comments');
   },
 };

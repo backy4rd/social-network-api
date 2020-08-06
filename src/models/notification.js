@@ -37,7 +37,7 @@ module.exports = (sequelize, DataTypes) => {
         type: 'TIMESTAMP',
       },
     },
-    { timestamps: false },
+    { timestamps: false, underscored: true },
   );
   Notification.associate = function (models) {
     Notification.belongsTo(models.User, {

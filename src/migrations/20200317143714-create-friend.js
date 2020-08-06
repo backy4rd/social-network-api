@@ -1,20 +1,20 @@
 module.exports = {
   up: (queryInterface, Sequelize) => {
-    return queryInterface.createTable('Friends', {
-      userA: {
+    return queryInterface.createTable('friends', {
+      user_a: {
         type: Sequelize.STRING(32),
         primaryKey: true,
         references: {
-          model: 'Users',
+          model: 'users',
           key: 'username',
         },
         onDelete: 'CASCADE',
       },
-      userB: {
+      user_b: {
         type: Sequelize.STRING(32),
         primaryKey: true,
         references: {
-          model: 'Users',
+          model: 'users',
           key: 'username',
         },
         onDelete: 'CASCADE',
@@ -23,17 +23,17 @@ module.exports = {
         type: Sequelize.STRING(10),
         allowNull: false,
       },
-      createdAt: {
+      created_at: {
         allowNull: false,
         type: Sequelize.DATE,
       },
-      updatedAt: {
+      updated_at: {
         allowNull: false,
         type: Sequelize.DATE,
       },
     });
   },
   down: (queryInterface, Sequelize) => {
-    return queryInterface.dropTable('Friends');
+    return queryInterface.dropTable('friends');
   },
 };

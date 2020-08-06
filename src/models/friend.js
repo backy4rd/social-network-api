@@ -29,7 +29,7 @@ module.exports = (sequelize, DataTypes) => {
         },
       },
     },
-    {},
+    { underscored: true },
   );
 
   Friend.associate = function (models) {

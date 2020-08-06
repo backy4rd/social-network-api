@@ -1,6 +1,6 @@
 module.exports = {
   up: (queryInterface, Sequelize) => {
-    return queryInterface.createTable('Notifications', {
+    return queryInterface.createTable('notifications', {
       id: {
         allowNull: false,
         autoIncrement: true,
@@ -11,7 +11,7 @@ module.exports = {
         type: Sequelize.STRING(32),
         allowNull: false,
         references: {
-          model: 'Users',
+          model: 'users',
           key: 'username',
         },
         onDelete: 'CASCADE',
@@ -20,23 +20,23 @@ module.exports = {
         type: Sequelize.STRING(32),
         allowNull: false,
         references: {
-          model: 'Users',
+          model: 'users',
           key: 'username',
         },
         onDelete: 'CASCADE',
       },
-      postId: {
+      post_id: {
         type: Sequelize.INTEGER,
         references: {
-          model: 'Posts',
+          model: 'posts',
           key: 'id',
         },
         onDelete: 'CASCADE',
       },
-      commentId: {
+      comment_id: {
         type: Sequelize.INTEGER,
         references: {
-          model: 'Comments',
+          model: 'comments',
           key: 'id',
         },
         onDelete: 'CASCADE',
@@ -45,7 +45,7 @@ module.exports = {
         type: Sequelize.STRING(10),
         allowNull: false,
       },
-      createdAt: {
+      created_at: {
         type: 'TIMESTAMP',
         defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
         allowNull: false,

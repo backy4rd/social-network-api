@@ -1,7 +1,7 @@
 module.exports = {
   up: (queryInterface, Sequelize) => {
     return queryInterface
-      .createTable('Users', {
+      .createTable('users', {
         username: {
           type: Sequelize.STRING(32),
           allowNull: false,
@@ -11,11 +11,11 @@ module.exports = {
           type: Sequelize.STRING(80),
           allowNull: false,
         },
-        firstName: {
+        first_name: {
           type: Sequelize.STRING(64) + ' CHARSET utf8 COLLATE utf8_unicode_ci',
           allowNull: false,
         },
-        lastName: {
+        last_name: {
           type: Sequelize.STRING(64) + ' CHARSET utf8 COLLATE utf8_unicode_ci',
           allowNull: false,
         },
@@ -36,18 +36,18 @@ module.exports = {
           defaultValue: false,
           allowNull: false,
         },
-        createdAt: {
+        created_at: {
           allowNull: false,
           type: Sequelize.DATE,
         },
-        updatedAt: {
+        updated_at: {
           allowNull: false,
           type: Sequelize.DATE,
         },
       })
-      .then(() => queryInterface.addIndex('Users', ['username']));
+      .then(() => queryInterface.addIndex('users', ['username']));
   },
   down: (queryInterface, Sequelize) => {
-    return queryInterface.dropTable('Users');
+    return queryInterface.dropTable('users');
   },
 };

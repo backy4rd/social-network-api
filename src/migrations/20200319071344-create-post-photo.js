@@ -1,16 +1,16 @@
 module.exports = {
   up: (queryInterface, Sequelize) => {
-    return queryInterface.createTable('PostPhotos', {
+    return queryInterface.createTable('post_photos', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER,
       },
-      postId: {
+      post_id: {
         type: Sequelize.INTEGER,
         references: {
-          model: 'Posts',
+          model: 'posts',
           key: 'id',
         },
         onDelete: 'CASCADE',
@@ -22,6 +22,6 @@ module.exports = {
     });
   },
   down: (queryInterface, Sequelize) => {
-    return queryInterface.dropTable('PostPhotos');
+    return queryInterface.dropTable('post_photos');
   },
 };

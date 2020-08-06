@@ -31,7 +31,7 @@ module.exports = (sequelize, DataTypes) => {
       },
       replyOf: { type: DataTypes.INTEGER, validate: { isInt: true } },
     },
-    {},
+    { underscored: true },
   );
   Comment.associate = function (models) {
     Comment.belongsTo(models.User, {

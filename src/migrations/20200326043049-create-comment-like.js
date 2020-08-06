@@ -1,25 +1,25 @@
 module.exports = {
   up: (queryInterface, Sequelize) => {
-    return queryInterface.createTable('CommentLikes', {
+    return queryInterface.createTable('comment_likes', {
       liker: {
         type: Sequelize.STRING(32),
         primaryKey: true,
         references: {
-          model: 'Users',
+          model: 'users',
           key: 'username',
         },
         onDelete: 'CASCADE',
       },
-      commentId: {
+      comment_id: {
         type: Sequelize.INTEGER,
         primaryKey: true,
         references: {
-          model: 'Comments',
+          model: 'comments',
           key: 'id',
         },
         onDelete: 'CASCADE',
       },
-      createdAt: {
+      created_at: {
         type: 'TIMESTAMP',
         defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
         allowNull: false,
@@ -27,6 +27,6 @@ module.exports = {
     });
   },
   down: (queryInterface, Sequelize) => {
-    return queryInterface.dropTable('CommentLikes');
+    return queryInterface.dropTable('comment_likes');
   },
 };
