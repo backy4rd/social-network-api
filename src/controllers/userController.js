@@ -18,7 +18,9 @@ const randomString = require('../utils/randomString');
 module.exports.getUser = asyncHandler(async (req, res, next) => {
   const { username } = req.params;
 
-  const user = await User.findByPk(username);
+  const user = await User.findByPk(username, {
+    attributes: ['username', 'firstName', 'lastName', 'female', 'avatar'],
+  });
 
   expect(user, `404:username doesn't exist`).to.exist;
 
@@ -33,9 +35,11 @@ module.exports.updateUser = asyncHandler(async (req, res, next) => {
   const { firstName, lastName } = req.body;
   const { file } = req;
 
-  expect(firstName || lastName || file, '400:missing parameters').to.be.true;
+  expect(firstName || lastName || file, '400:missing parameters').to.be.exist;
 
-  const user = await User.findByPk(username);
+  const user = await User.findByPk(username, {
+    attributes: { exclude: ['password'] },
+  });
 
   if (firstName) {
     user.firstName = firstName;
