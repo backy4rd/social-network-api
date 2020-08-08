@@ -13,6 +13,7 @@ const asyncHandler = require('../utils/asyncHandler');
 const ErrorResponse = require('../utils/errorResponse');
 const responseHandler = require('../utils/responseHandler');
 const requestHandler = require('../utils/requestHandler');
+const randomString = require('../utils/randomString');
 
 module.exports.getUser = asyncHandler(async (req, res, next) => {
   const { username } = req.params;
@@ -48,11 +49,11 @@ module.exports.updateUser = asyncHandler(async (req, res, next) => {
     // if not, avatar will be saved to disk even though data is invalid
     await user.validate({ fields: { exclude: ['password'] } });
 
-    const uniqueName = `${Date.now()}-${Math.random().toFixed(3)}.jpg`;
+    const uniqueName = `${randomString(32)}.jpg`;
 
     // remove previous avatar
     if (user.avatar !== 'avatars/default.jpg') {
-      fs.unlink(`./static/${user.avatar}`);
+      fs.unlink(`./static/${user.avatar}`, () => {});
     }
 
     // resize, convert type and save

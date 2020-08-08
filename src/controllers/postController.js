@@ -7,6 +7,7 @@ const asyncHandler = require('../utils/asyncHandler');
 const ErrorResponse = require('../utils/errorResponse');
 const responseHandler = require('../utils/responseHandler');
 const requestHandler = require('../utils/requestHandler');
+const randomString = require('../utils/randomString');
 
 module.exports.createPost = asyncHandler(async (req, res, next) => {
   const { username } = req.user;
@@ -24,7 +25,7 @@ module.exports.createPost = asyncHandler(async (req, res, next) => {
     const photoDests = [];
 
     files.forEach(file => {
-      const uniqueName = `${Date.now()}-${Math.random().toFixed(3)}.jpg`;
+      const uniqueName = `${randomString(32)}.jpg`;
       sharp(file.buffer)
         .resize(1080)
         .jpeg()
@@ -89,7 +90,7 @@ module.exports.updatePost = asyncHandler(async (req, res, next) => {
     if (removePhotoList.length !== 0) {
       // remove from storage
       removePhotoList.forEach(photo => {
-        fs.unlink(`./static/${photo.photo}`);
+        fs.unlink(`./static/${photo.photo}`, () => {});
       });
 
       // remove from database
@@ -105,12 +106,11 @@ module.exports.updatePost = asyncHandler(async (req, res, next) => {
       });
     }
   }
-
   if (files.length !== 0) {
     const photoDests = [];
 
     files.forEach(file => {
-      const uniqueName = `${Date.now()}-${Math.random().toFixed(3)}.jpg`;
+      const uniqueName = `${randomString(32)}.jpg`;
       sharp(file.buffer)
         .resize(1080)
         .jpeg()
@@ -141,7 +141,7 @@ module.exports.deletePost = asyncHandler(async (req, res, next) => {
 
   // delete photo from storage
   photos.forEach(photo => {
-    fs.unlink(`./static/${photo.photo}`);
+    fs.unlink(`./static/${photo.photo}`, () => {});
   });
 
   await post.destroy();

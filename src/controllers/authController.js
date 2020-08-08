@@ -8,6 +8,7 @@ const asyncHandler = require('../utils/asyncHandler');
 const ErrorResponse = require('../utils/errorResponse');
 const transporter = require('../utils/mailTransporter');
 const responseHandler = require('../utils/responseHandler');
+const randomString = require('../utils/randomString');
 
 module.exports.register = asyncHandler(async (req, res, next) => {
   const { username, password, firstName, lastName, female, email } = req.body;
@@ -205,7 +206,7 @@ module.exports.OAuthGoogle = asyncHandler(async (req, res, next) => {
   if (!user) {
     user = await User.build({
       username: profile.sub,
-      password: Date.now().toString() + Math.random().toString(),
+      password: randomString(32),
       firstName: profile.given_name,
       lastName: profile.family_name,
       email: profile.email,
@@ -256,7 +257,7 @@ module.exports.OAuthFacebook = asyncHandler(async (req, res, next) => {
   if (!user) {
     user = await User.build({
       username: profile.id,
-      password: Date.now().toString() + Math.random().toString(),
+      password: randomString(32),
       firstName: `${profile.first_name} ${profile.middle_name || ''}`.trim(),
       lastName: profile.last_name,
       email: profile.email,
