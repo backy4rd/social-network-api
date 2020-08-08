@@ -5,6 +5,7 @@ const friendController = require('../controllers/friendController');
 
 const validateMiddleware = require('../middlewares/validateMiddleware');
 const finderMiddleware = require('../middlewares/finderMiddleware');
+const checkerMiddleware = require('../middlewares/checkerMiddleware');
 
 const router = express.Router();
 
@@ -17,6 +18,7 @@ router.get(
   '/add',
   validateMiddleware.authorize,
   finderMiddleware.findTarget,
+  checkerMiddleware.checkTargetExist,
   friendController.addFriend,
 );
 
@@ -25,6 +27,7 @@ router.get(
   '/breakup',
   validateMiddleware.authorize,
   finderMiddleware.findTarget,
+  checkerMiddleware.checkTargetExist,
   friendController.unfriend,
 );
 
@@ -33,6 +36,7 @@ router.get(
   '/decide',
   validateMiddleware.authorize,
   finderMiddleware.findTarget,
+  checkerMiddleware.checkTargetExist,
   friendController.decide,
 );
 
@@ -41,6 +45,7 @@ router.get(
   '/unsent',
   validateMiddleware.authorize,
   finderMiddleware.findTarget,
+  checkerMiddleware.checkTargetExist,
   friendController.unsent,
 );
 

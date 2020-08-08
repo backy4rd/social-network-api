@@ -44,6 +44,7 @@ router.patch(
   '/:postId(\\d+)',
   validateMiddleware.authorize,
   finderMiddleware.findPost,
+  checkerMiddleware.checkPostExist,
   ownerMiddleware.ownerPost,
   upload.array('photos', 20),
   postController.updatePost,
@@ -54,6 +55,7 @@ router.delete(
   '/:postId(\\d+)',
   validateMiddleware.authorize,
   finderMiddleware.findPost,
+  checkerMiddleware.checkPostExist,
   ownerMiddleware.ownerPost,
   postController.deletePost,
 );
@@ -63,6 +65,7 @@ router.get(
   '/:postId(\\d+)',
   validateMiddleware.identify,
   finderMiddleware.findPost,
+  checkerMiddleware.checkPostExist,
   checkerMiddleware.checkPostStatusPermission,
   postController.getPost,
 );
@@ -72,6 +75,7 @@ router.get(
   '/:postId(\\d+)/like',
   validateMiddleware.authorize,
   finderMiddleware.findPost,
+  checkerMiddleware.checkPostExist,
   checkerMiddleware.checkPostStatusPermission,
   postController.like,
 );
@@ -81,6 +85,7 @@ router.get(
   '/:postId(\\d+)/likes',
   validateMiddleware.identify,
   finderMiddleware.findPost,
+  checkerMiddleware.checkPostExist,
   checkerMiddleware.checkPostStatusPermission,
   postController.getLikes,
 );

@@ -28,8 +28,10 @@ router.patch(
   '/:commentId(\\d+)',
   validateMiddleware.authorize,
   finderMiddleware.findPost,
+  checkerMiddleware.checkPostExist,
   checkerMiddleware.checkPostStatusPermission,
   finderMiddleware.findComment,
+  checkerMiddleware.checkCommentExist,
   ownerMiddleware.ownerComment,
   commentController.updateComment,
 );
@@ -39,8 +41,10 @@ router.delete(
   '/:commentId(\\d+)',
   validateMiddleware.authorize,
   finderMiddleware.findPost,
+  checkerMiddleware.checkPostExist,
   checkerMiddleware.checkPostStatusPermission,
   finderMiddleware.findComment,
+  checkerMiddleware.checkCommentExist,
   ownerMiddleware.ownerComment,
   commentController.deleteComment,
 );
@@ -50,6 +54,7 @@ router.get(
   '/',
   validateMiddleware.identify,
   finderMiddleware.findPost,
+  checkerMiddleware.checkPostExist,
   checkerMiddleware.checkPostStatusPermission,
   commentController.getPostComments,
 );
@@ -59,8 +64,10 @@ router.post(
   '/:commentId(\\d+)/reply',
   validateMiddleware.authorize,
   finderMiddleware.findPost,
+  checkerMiddleware.checkPostExist,
   checkerMiddleware.checkPostStatusPermission,
   finderMiddleware.findComment,
+  checkerMiddleware.checkCommentExist,
   commentController.replyComment,
 );
 
@@ -69,8 +76,10 @@ router.get(
   '/:commentId(\\d+)/replies',
   validateMiddleware.identify,
   finderMiddleware.findPost,
+  checkerMiddleware.checkPostExist,
   checkerMiddleware.checkPostStatusPermission,
   finderMiddleware.findComment,
+  checkerMiddleware.checkCommentExist,
   commentController.getReplyComments,
 );
 
@@ -79,8 +88,10 @@ router.get(
   '/:commentId(\\d+)/like',
   validateMiddleware.authorize,
   finderMiddleware.findPost,
+  checkerMiddleware.checkPostExist,
   checkerMiddleware.checkPostStatusPermission,
   finderMiddleware.findComment,
+  checkerMiddleware.checkCommentExist,
   commentController.likeComment,
 );
 
@@ -89,8 +100,10 @@ router.get(
   '/:commentId(\\d+)/likes',
   validateMiddleware.identify,
   finderMiddleware.findPost,
+  checkerMiddleware.checkPostExist,
   checkerMiddleware.checkPostStatusPermission,
   finderMiddleware.findComment,
+  checkerMiddleware.checkCommentExist,
   commentController.getCommentLikes,
 );
 
