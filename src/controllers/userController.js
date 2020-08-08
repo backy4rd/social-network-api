@@ -24,7 +24,7 @@ module.exports.getUser = asyncHandler(async (req, res, next) => {
 
   res.status(200).json({
     status: 'success',
-    data: responseHandler.processUser(user),
+    data: responseHandler.toUndercored(user),
   });
 });
 
@@ -69,7 +69,7 @@ module.exports.updateUser = asyncHandler(async (req, res, next) => {
 
   res.status(200).json({
     status: 'success',
-    data: responseHandler.processUser(user),
+    data: responseHandler.toUndercored(user),
   });
 });
 
@@ -130,7 +130,7 @@ module.exports.getPost = asyncHandler(async (req, res, next) => {
 
   res.status(200).json({
     status: 'success',
-    data: responseHandler.processPost(posts),
+    data: responseHandler.toUndercored(posts),
   });
 });
 
@@ -148,7 +148,7 @@ module.exports.getOwnPost = asyncHandler(async (req, res, next) => {
 
   res.status(200).json({
     status: 'success',
-    data: responseHandler.processPost(posts),
+    data: responseHandler.toUndercored(posts),
   });
 });
 
@@ -158,7 +158,7 @@ module.exports.getFriends = asyncHandler(async (req, res, next) => {
 
   const friends = await Friend.findAll({
     where: { [Op.and]: [{ userA: username }, { status: 'friend' }] },
-    attributes: [['userB', 'friend'], 'status', 'createdAt', 'updatedAt'],
+    attributes: [['user_b', 'friend'], 'status', 'createdAt', 'updatedAt'],
     offset: from,
     limit: limit,
     order: ['createdAt'],
@@ -170,7 +170,7 @@ module.exports.getFriends = asyncHandler(async (req, res, next) => {
 
   res.status(200).json({
     status: 'success',
-    data: responseHandler.processFriend(friends),
+    data: responseHandler.toUndercored(friends),
   });
 });
 
@@ -180,7 +180,7 @@ module.exports.getFriendsRequest = asyncHandler(async (req, res, next) => {
 
   const friendRequests = await Friend.findAll({
     where: { [Op.and]: [{ userA: username }, { status: 'pending' }] },
-    attributes: [['userB', 'from'], 'status', 'createdAt', 'updatedAt'],
+    attributes: [['user_b', 'from'], 'status', 'createdAt', 'updatedAt'],
     offset: from,
     limit: limit,
     order: ['createdAt'],
@@ -192,6 +192,6 @@ module.exports.getFriendsRequest = asyncHandler(async (req, res, next) => {
 
   res.status(200).json({
     status: 'success',
-    data: responseHandler.processFriend(friendRequests),
+    data: responseHandler.toUndercored(friendRequests),
   });
 });

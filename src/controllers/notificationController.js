@@ -17,6 +17,6 @@ module.exports.getNotification = asyncHandler(async (req, res, next) => {
 
   res.status(200).json({
     status: 'success',
-    data: responseHandler.processNotification(notifications),
+    data: responseHandler.toUndercored(notifications),
   });
 });

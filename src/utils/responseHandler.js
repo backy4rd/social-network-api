@@ -1,82 +1,33 @@
-const url = require('url');
+const { Model } = require('sequelize');
 
-const staticUrl = url.format({
-  protocol: process.env.PROTOCOL || 'http',
-  hostname: process.env.DOMAIN || 'localhost',
-  port: process.env.DOMAIN ? undefined : process.env.PORT,
-  pathname: '/static/',
-});
+const getUnderscored = str => {
+  return str
+    .split(/(?=[A-Z])/)
+    .join('_')
+    .toLowerCase();
+};
 
-module.exports.processPost = posts => {
-  const res = posts;
-  // convert relative url to absolute url
-  if (!Array.isArray(res)) {
-    const { photos } = res.dataValues;
-    if (photos) {
-      for (let i = 0; i < photos.length; i++) {
-        const photo = photos[i];
-
-        photo.dataValues.photo = url.resolve(staticUrl, photo.dataValues.photo);
-      }
-    }
-  } else {
-    res.forEach(post => {
-      const { photos } = post.dataValues;
-      if (photos) {
-        for (let i = 0; i < photos.length; i++) {
-          const photo = photos[i];
-
-          photo.dataValues.photo = url.resolve(
-            staticUrl,
-            photo.dataValues.photo,
-          );
-        }
-      }
-    });
+const toUnderscored = data => {
+  if (Array.isArray(data)) {
+    return data.map(ele => toUnderscored(ele));
   }
 
-  return res;
+  // if data is Sequelize Instance or object literal
+  if (data.constructor === Object || data instanceof Model) {
+    const afterUnderscored = {};
+
+    // get plain object if data is Sequelize Instance
+    if (data instanceof Model) {
+      data = data.get({ plain: true });
+    }
+
+    for (key in data) {
+      afterUnderscored[getUnderscored(key)] = toUnderscored(data[key]);
+    }
+    return afterUnderscored;
+  }
+
+  return data;
 };
 
-module.exports.processUser = user => {
-  const res = user;
-
-  res.dataValues.avatar = url.resolve(staticUrl, user.dataValues.avatar);
-  delete res.dataValues.password;
-
-  return res;
-};
-
-module.exports.processFriend = friends => {
-  const res = friends;
-
-  res.forEach(friend => {
-    const { User } = friend;
-    User.dataValues.avatar = url.resolve(staticUrl, User.dataValues.avatar);
-    delete User.dataValues.password;
-  });
-
-  return res;
-};
-
-module.exports.processNotification = notifications => {
-  const res = notifications;
-
-  res.forEach(notification => {
-    const { User: user } = notification;
-    user.dataValues.avatar = url.resolve(staticUrl, user.dataValues.avatar);
-  });
-
-  return res;
-};
-
-module.exports.processComment = comments => {
-  const res = comments;
-
-  res.forEach(comment => {
-    const { User: user } = comment;
-    user.dataValues.avatar = url.resolve(staticUrl, user.dataValues.avatar);
-  });
-
-  return res;
-};
+module.exports.toUndercored = toUnderscored;

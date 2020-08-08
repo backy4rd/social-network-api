@@ -29,7 +29,7 @@ module.exports.createComment = asyncHandler(async (req, res, next) => {
 
   res.status(201).json({
     status: 'success',
-    data: newComment,
+    data: responseHandler.toUnderscored(newComment),
   });
 });
 
@@ -48,7 +48,7 @@ module.exports.getPostComments = asyncHandler(async (req, res, next) => {
 
   res.status(200).json({
     status: 'success',
-    data: responseHandler.processComment(comments),
+    data: responseHandler.toUnderscored(comments),
   });
 });
 
@@ -65,7 +65,7 @@ module.exports.getReplyComments = asyncHandler(async (req, res, next) => {
 
   res.status(200).json({
     status: 'success',
-    data: responseHandler.processComment(replies),
+    data: responseHandler.toUnderscored(replies),
   });
 });
 
@@ -80,7 +80,7 @@ module.exports.updateComment = asyncHandler(async (req, res, next) => {
 
   res.status(200).json({
     status: 'success',
-    data: comment,
+    data: responseHandler.toUnderscored(comment),
   });
 });
 
@@ -121,7 +121,7 @@ module.exports.replyComment = asyncHandler(async (req, res, next) => {
 
   res.status(201).json({
     status: 'success',
-    data: replyComment,
+    data: responseHandler.toUnderscored(replyComment),
   });
 });
 
@@ -171,6 +171,6 @@ module.exports.getCommentLikes = asyncHandler(async (req, res, next) => {
 
   res.status(200).json({
     status: 'success',
-    data: users,
+    data: responseHandler.toUnderscored(users),
   });
 });

@@ -57,7 +57,7 @@ module.exports.createPost = asyncHandler(async (req, res, next) => {
 
   res.status(201).json({
     status: 'success',
-    data: responseHandler.processPost(newPost),
+    data: responseHandler.toUnderscored(newPost),
   });
 });
 
@@ -130,7 +130,7 @@ module.exports.updatePost = asyncHandler(async (req, res, next) => {
 
   res.status(200).json({
     status: 'success',
-    data: responseHandler.processPost(post),
+    data: responseHandler.toUnderscored(post),
   });
 });
 
@@ -198,7 +198,7 @@ module.exports.getLikes = asyncHandler(async (req, res, next) => {
 
   res.status(200).json({
     status: 'success',
-    data: likes,
+    data: responseHandler.toUnderscored(likes),
   });
 });
 
@@ -207,6 +207,6 @@ module.exports.getPost = asyncHandler(async (req, res, next) => {
 
   res.status(200).json({
     status: 'success',
-    data: responseHandler.processPost(post),
+    data: responseHandler.toUndercored(post),
   });
 });
