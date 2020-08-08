@@ -5,7 +5,7 @@ const asyncHandler = require('../utils/asyncHandler');
 const ErrorResponse = require('../utils/errorResponse');
 
 module.exports.authorize = asyncHandler((req, res, next) => {
-  const token = req.cookies.token || req.headers.authorization;
+  const token = req.headers.authorization;
   const secret = process.env.SECRET;
 
   expect(token, '401:unauthorized').to.exist;
@@ -19,7 +19,7 @@ module.exports.authorize = asyncHandler((req, res, next) => {
 });
 
 module.exports.identify = asyncHandler((req, res, next) => {
-  const token = req.cookies.token || req.headers.authorization;
+  const token = req.headers.authorization;
   const secret = process.env.SECRET;
 
   if (!token) return next();

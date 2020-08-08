@@ -1,5 +1,4 @@
 const express = require('express');
-const cookieParser = require('cookie-parser');
 
 const commentController = require('../controllers/commentController');
 
@@ -12,7 +11,6 @@ const router = express.Router({ mergeParams: true });
 
 router.use(express.json());
 router.use(express.urlencoded({ extended: false }));
-router.use(cookieParser());
 
 // create comment
 router.post(

@@ -31,10 +31,9 @@ module.exports.register = asyncHandler(async (req, res, next) => {
 
   const token = await newUser.generateAccessToken();
 
-  res.cookie('token', token, { httpOnly: true });
   res.status(201).json({
     status: 'success',
-    data: responseHandler.processUser(newUser),
+    data: { token: token },
   });
 });
 
@@ -51,10 +50,9 @@ module.exports.login = asyncHandler(async (req, res, next) => {
 
   const token = await user.generateAccessToken();
 
-  res.cookie('token', token, { httpOnly: true });
   res.status(200).json({
     status: 'success',
-    data: responseHandler.processUser(user),
+    data: { token: token },
   });
 });
 
@@ -83,13 +81,13 @@ module.exports.sendVerificationMail = asyncHandler(async (req, res, next) => {
     text: verificationUrl,
   };
 
+  transporter.sendMail(mailOptions, err => {
+    if (err) next(err);
+  });
+
   res.status(200).json({
     status: 'success',
     data: 'send mail success',
-  });
-
-  transporter.sendMail(mailOptions, err => {
-    if (err) next(err);
   });
 });
 
@@ -111,8 +109,6 @@ module.exports.verifyVerificationMail = asyncHandler(async (req, res, next) => {
     await user.save();
 
     const newToken = await user.generateAccessToken();
-
-    res.cookie('token', newToken, { httpOnly: true });
 
     res.status(200).json({
       status: 'success',
@@ -142,13 +138,13 @@ module.exports.sendForgotMail = asyncHandler(async (req, res, next) => {
 
   req.session.append(username, code);
 
+  transporter.sendMail(mailOptions, err => {
+    if (err) next(err);
+  });
+
   res.status(200).json({
     status: 'success',
     data: 'send mail success',
-  });
-
-  transporter.sendMail(mailOptions, err => {
-    if (err) next(err);
   });
 });
 
@@ -221,10 +217,9 @@ module.exports.OAuthGoogle = asyncHandler(async (req, res, next) => {
 
   const token = await user.generateAccessToken();
 
-  res.cookie('token', token, { httpOnly: true });
   res.status(statusCode).json({
     status: 'success',
-    data: responseHandler.processUser(user),
+    data: { token: token },
   });
 });
 
@@ -272,9 +267,8 @@ module.exports.OAuthFacebook = asyncHandler(async (req, res, next) => {
 
   const token = await user.generateAccessToken();
 
-  res.cookie('token', token, { httpOnly: true });
   res.status(statusCode).json({
     status: 'success',
-    data: responseHandler.processUser(user),
+    data: { token: token },
   });
 });

@@ -1,5 +1,4 @@
 const express = require('express');
-const cookieParser = require('cookie-parser');
 const multer = require('multer');
 
 const commentRouter = require('./commentRouter');
@@ -27,7 +26,6 @@ const upload = multer({
 
 router.use(express.json());
 router.use(express.urlencoded({ extended: false }));
-router.use(cookieParser());
 
 router.use('/:postId(\\d+)/comments', commentRouter);
 

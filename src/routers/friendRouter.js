@@ -1,5 +1,4 @@
 const express = require('express');
-const cookieParser = require('cookie-parser');
 
 const friendController = require('../controllers/friendController');
 
@@ -8,10 +7,6 @@ const finderMiddleware = require('../middlewares/finderMiddleware');
 const checkerMiddleware = require('../middlewares/checkerMiddleware');
 
 const router = express.Router();
-
-router.use(cookieParser());
-router.use(validateMiddleware.authorize);
-router.use(finderMiddleware.findTarget);
 
 // add friend
 router.get(

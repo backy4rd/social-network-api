@@ -1,5 +1,4 @@
 const express = require('express');
-const cookieParser = require('cookie-parser');
 const multer = require('multer');
 
 const userController = require('../controllers/userController');
@@ -22,7 +21,6 @@ const upload = multer({
 
 router.use(express.json());
 router.use(express.urlencoded({ extended: false }));
-router.use(cookieParser());
 
 // get user post
 router.get(

@@ -1,5 +1,4 @@
 const express = require('express');
-const cookieParser = require('cookie-parser');
 
 const authController = require('../controllers/authController');
 
@@ -11,7 +10,6 @@ const router = express.Router();
 
 router.use(express.json());
 router.use(express.urlencoded({ extended: false }));
-router.use(cookieParser());
 
 // register
 router.post('/register', authController.register);
