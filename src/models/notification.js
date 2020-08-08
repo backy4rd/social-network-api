@@ -33,11 +33,8 @@ module.exports = (sequelize, DataTypes) => {
           is: /^(comment)|(like)$/,
         },
       },
-      createdAt: {
-        type: 'TIMESTAMP',
-      },
     },
-    { timestamps: false, underscored: true },
+    { timestamps: true, updatedAt: false, underscored: true },
   );
   Notification.associate = function (models) {
     Notification.belongsTo(models.User, {

@@ -15,11 +15,8 @@ module.exports = (sequelize, DataTypes) => {
         primaryKey: true,
         validate: { isInt: true },
       },
-      createdAt: {
-        type: 'TIMESTAMP',
-      },
     },
-    { timestamps: false, underscored: true },
+    { timestamps: true, updatedAt: false, underscored: true },
   );
   Like.associate = function (models) {
     Like.belongsTo(models.User, {
