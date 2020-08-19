@@ -101,7 +101,7 @@ module.exports.replyComment = asyncHandler(async (req, res, next) => {
   const { comment } = req;
 
   expect(content, '400:missing parameters').to.exist;
-  expect(content, '400:unaccepted nesting reply').to.not.be.null;
+  expect(comment.replyOf, '400:unaccepted nesting reply').to.be.null;
 
   const replyComment = await Comment.create({
     commenter: username,
@@ -163,8 +163,8 @@ module.exports.getCommentLikes = asyncHandler(async (req, res, next) => {
   const { from, limit } = requestHandler.range(req, [20, 200]);
 
   const users = await comment.getCommentLikes({
-    offset: parseInt(from, 10),
-    limit: parseInt(limit, 10),
+    offset: from,
+    limit: limit,
     order: ['createdAt'],
     include: { model: User, attributes: ['lastName', 'lastName'] },
   });

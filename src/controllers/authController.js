@@ -253,7 +253,7 @@ module.exports.OAuthFacebook = asyncHandler(async (req, res, next) => {
     user = await User.build({
       username: profile.id,
       password: randomString(32),
-      firstName: `${profile.first_name} ${profile.middle_name || ''}`.trim(),
+      firstName: [profile.first_name, profile.middle_name].join(' ').trim(),
       lastName: profile.last_name,
       email: profile.email,
       female: null,
