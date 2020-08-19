@@ -207,6 +207,6 @@ module.exports.getPost = asyncHandler(async (req, res, next) => {
 
   res.status(200).json({
     status: 'success',
-    data: responseHandler.toUndercored(post),
+    data: responseHandler.toUnderscored(post),
   });
 });

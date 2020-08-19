@@ -30,4 +30,4 @@ const toUnderscored = data => {
   return data;
 };
 
-module.exports.toUndercored = toUnderscored;
+module.exports.toUnderscored = toUnderscored;

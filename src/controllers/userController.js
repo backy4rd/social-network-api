@@ -26,7 +26,7 @@ module.exports.getUser = asyncHandler(async (req, res, next) => {
 
   res.status(200).json({
     status: 'success',
-    data: responseHandler.toUndercored(user),
+    data: responseHandler.toUnderscored(user),
   });
 });
 
@@ -73,7 +73,7 @@ module.exports.updateUser = asyncHandler(async (req, res, next) => {
 
   res.status(200).json({
     status: 'success',
-    data: responseHandler.toUndercored(user),
+    data: responseHandler.toUnderscored(user),
   });
 });
 
@@ -134,7 +134,7 @@ module.exports.getPost = asyncHandler(async (req, res, next) => {
 
   res.status(200).json({
     status: 'success',
-    data: responseHandler.toUndercored(posts),
+    data: responseHandler.toUnderscored(posts),
   });
 });
 
@@ -152,7 +152,7 @@ module.exports.getOwnPost = asyncHandler(async (req, res, next) => {
 
   res.status(200).json({
     status: 'success',
-    data: responseHandler.toUndercored(posts),
+    data: responseHandler.toUnderscored(posts),
   });
 });
 
@@ -174,7 +174,7 @@ module.exports.getFriends = asyncHandler(async (req, res, next) => {
 
   res.status(200).json({
     status: 'success',
-    data: responseHandler.toUndercored(friends),
+    data: responseHandler.toUnderscored(friends),
   });
 });
 
@@ -196,6 +196,6 @@ module.exports.getFriendsRequest = asyncHandler(async (req, res, next) => {
 
   res.status(200).json({
     status: 'success',
-    data: responseHandler.toUndercored(friendRequests),
+    data: responseHandler.toUnderscored(friendRequests),
   });
 });
